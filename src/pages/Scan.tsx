@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ScanBarcode, Loader2 } from "lucide-react";
+import { ScanBarcode, Loader2, Camera, Keyboard } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Html5Qrcode } from "html5-qrcode";
 
 interface ProductResult {
   name: string;
@@ -24,6 +25,18 @@ const Scan = () => {
   const [barcode, setBarcode] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ProductResult | null>(null);
+  const [scanMode, setScanMode] = useState<"manual" | "camera">("manual");
+  const [isScanning, setIsScanning] = useState(false);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scannerDivId = "barcode-scanner";
+
+  useEffect(() => {
+    return () => {
+      if (scannerRef.current && isScanning) {
+        scannerRef.current.stop().catch(console.error);
+      }
+    };
+  }, [isScanning]);
 
   const handleScan = async () => {
     if (!barcode.trim()) {
@@ -46,6 +59,56 @@ const Scan = () => {
       toast.error("Failed to analyze product. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const startCameraScanning = async () => {
+    try {
+      setIsScanning(true);
+      const html5QrCode = new Html5Qrcode(scannerDivId);
+      scannerRef.current = html5QrCode;
+
+      await html5QrCode.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+        },
+        (decodedText) => {
+          setBarcode(decodedText);
+          stopCameraScanning();
+          toast.success("Barcode detected!");
+        },
+        () => {
+          // Error callback - ignore individual frame errors
+        }
+      );
+    } catch (error) {
+      console.error("Camera error:", error);
+      toast.error("Failed to access camera");
+      setIsScanning(false);
+    }
+  };
+
+  const stopCameraScanning = async () => {
+    if (scannerRef.current && isScanning) {
+      try {
+        await scannerRef.current.stop();
+        scannerRef.current = null;
+        setIsScanning(false);
+      } catch (error) {
+        console.error("Error stopping scanner:", error);
+      }
+    }
+  };
+
+  const toggleScanMode = () => {
+    if (scanMode === "camera") {
+      stopCameraScanning();
+      setScanMode("manual");
+    } else {
+      setScanMode("camera");
+      startCameraScanning();
     }
   };
 
@@ -77,34 +140,93 @@ const Scan = () => {
 
         {/* Scanner Input */}
         <Card className="p-6 mb-8">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <Input
-                type="text"
-                placeholder="Enter barcode (e.g., 3017620422003)"
-                value={barcode}
-                onChange={(e) => setBarcode(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleScan()}
-                className="text-lg"
-              />
-            </div>
-            <Button 
-              onClick={handleScan} 
-              disabled={loading}
-              size="lg"
-              className="gap-2"
+          <div className="flex gap-2 mb-4">
+            <Button
+              variant={scanMode === "manual" ? "default" : "outline"}
+              onClick={() => {
+                stopCameraScanning();
+                setScanMode("manual");
+              }}
+              className="flex-1 gap-2"
             >
-              {loading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <ScanBarcode className="h-5 w-5" />
-              )}
-              Analyze
+              <Keyboard className="h-4 w-4" />
+              Manual
+            </Button>
+            <Button
+              variant={scanMode === "camera" ? "default" : "outline"}
+              onClick={toggleScanMode}
+              className="flex-1 gap-2"
+            >
+              <Camera className="h-4 w-4" />
+              Camera
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground mt-2">
-            Try example: 3017620422003 (Nutella)
-          </p>
+
+          {scanMode === "manual" ? (
+            <>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <Input
+                    type="text"
+                    placeholder="Enter barcode (e.g., 3017620422003)"
+                    value={barcode}
+                    onChange={(e) => setBarcode(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleScan()}
+                    className="text-lg"
+                  />
+                </div>
+                <Button 
+                  onClick={handleScan} 
+                  disabled={loading}
+                  size="lg"
+                  className="gap-2"
+                >
+                  {loading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <ScanBarcode className="h-5 w-5" />
+                  )}
+                  Analyze
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                Try example: 3017620422003 (Nutella)
+              </p>
+            </>
+          ) : (
+            <>
+              <div 
+                id={scannerDivId} 
+                className="w-full rounded-lg overflow-hidden bg-muted"
+                style={{ minHeight: "300px" }}
+              />
+              {barcode && (
+                <div className="mt-4">
+                  <p className="text-sm text-muted-foreground mb-2">Detected barcode:</p>
+                  <div className="flex gap-2">
+                    <Input
+                      type="text"
+                      value={barcode}
+                      readOnly
+                      className="flex-1"
+                    />
+                    <Button 
+                      onClick={handleScan} 
+                      disabled={loading}
+                      className="gap-2"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <ScanBarcode className="h-5 w-5" />
+                      )}
+                      Analyze
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </Card>
 
         {/* Results Display */}
