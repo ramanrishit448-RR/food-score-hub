@@ -39,58 +39,52 @@ serve(async (req) => {
     const nutriscore_grade = product.nutriscore_grade || '';
 
     // Prepare data for AI analysis
-    const analysisPrompt = `You are a friendly and expert dietary assistant. Analyze this food product and provide detailed health risk analysis and healthier alternatives.
+    const analysisPrompt = `Analyze this food product and provide a complete health assessment.
 
 Product: ${product.product_name || 'Unknown'}
 Brand: ${product.brands || 'Unknown'}
 
 Nutritional Data (per 100g):
 - Energy: ${nutriments.energy_100g || 'N/A'} kcal
-- Fat: ${nutriments.fat_100g || 'N/A'}g
-- Saturated Fat: ${nutriments['saturated-fat_100g'] || 'N/A'}g
-- Carbohydrates: ${nutriments.carbohydrates_100g || 'N/A'}g
-- Sugars: ${nutriments.sugars_100g || 'N/A'}g
+- Fat: ${nutriments.fat_100g || 'N/A'}g (Saturated: ${nutriments['saturated-fat_100g'] || 'N/A'}g)
+- Carbs: ${nutriments.carbohydrates_100g || 'N/A'}g (Sugars: ${nutriments.sugars_100g || 'N/A'}g)
 - Fiber: ${nutriments.fiber_100g || 'N/A'}g
 - Protein: ${nutriments.proteins_100g || 'N/A'}g
 - Salt: ${nutriments.salt_100g || 'N/A'}g
-
-Additional Info:
-- NOVA Group: ${nova_group} (1=unprocessed, 4=ultra-processed)
+- Processing Level (NOVA): ${nova_group}/4
 - Nutri-Score: ${nutriscore_grade.toUpperCase() || 'N/A'}
-- Number of Additives: ${additives.length}
-- Ingredients: ${ingredients.substring(0, 300)}
+- Additives: ${additives.length}
+- Ingredients: ${ingredients.substring(0, 400)}
 
-Please analyze and return ONLY a JSON object (no markdown, no extra text) with this exact structure:
+REQUIRED: Return a valid JSON object with ALL fields below. Do not skip health_risks or alternatives arrays.
+
 {
-  "health_score": <number 0-10>,
-  "recommendation": "<EAT|BUY|AVOID>",
-  "nutrition_score": <number 0-10>,
-  "ingredient_quality": <number 0-10>,
-  "additives_score": <number 0-10>,
+  "health_score": 5,
+  "recommendation": "BUY",
+  "nutrition_score": 6,
+  "ingredient_quality": 5,
+  "additives_score": 7,
   "health_risks": [
     {
-      "nutrient": "string (e.g., High Fructose Corn Syrup)",
-      "risk": "string (e.g., Weight Gain & Type 2 Diabetes)",
-      "explanation": "string (brief one-sentence explanation)"
+      "nutrient": "Added Sugars",
+      "risk": "Weight Gain & Type 2 Diabetes",
+      "explanation": "High sugar content spikes blood glucose and promotes fat storage."
     }
   ],
   "alternatives": [
     {
-      "name": "string (alternative product name)",
-      "why_better": "string (key nutritional benefit)",
-      "how_helps": "string (positive health outcome)"
+      "name": "Plain Greek Yogurt",
+      "why_better": "High protein, no added sugars, probiotics",
+      "how_helps": "Supports gut health and provides lasting energy without blood sugar spikes."
     }
   ]
 }
 
-Scoring guidelines:
-- health_score: Overall assessment (8-10=excellent, 6-7=good, 4-5=moderate, 2-3=poor, 0-1=very poor)
-- recommendation: EAT (score 7+), BUY (score 4-6), AVOID (score 0-3)
-- nutrition_score: Based on macro/micronutrients balance
-- ingredient_quality: Based on processing level and ingredient list
-- additives_score: Penalize for number and type of additives
-- health_risks: Array of 3-5 specific nutrients of concern with their risks and explanations
-- alternatives: Array of 3-5 healthier product alternatives with specific reasons`;
+CRITICAL: 
+- health_risks MUST contain 3-5 entries identifying specific problematic nutrients
+- alternatives MUST contain 3-5 healthier product swaps with clear benefits
+- Use actual data above to assess the product
+- recommendation: "EAT" (score 7+), "BUY" (score 4-6), "AVOID" (score 0-3)`;
 
     // Call Lovable AI for analysis
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -109,11 +103,10 @@ Scoring guidelines:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a nutrition expert AI. Analyze food products and provide health scores. Always respond with valid JSON only, no markdown formatting.'
+            content: 'You are a dietary health expert. Analyze food products and return complete JSON responses with health_risks and alternatives arrays. Always include all required fields. Return only valid JSON, no markdown.'
           },
           { role: 'user', content: analysisPrompt }
         ],
-        temperature: 0.3,
       }),
     });
 
