@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ScanBarcode } from "lucide-react";
 import { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 const Navigation = () => {
   const location = useLocation();
@@ -55,6 +56,7 @@ const Navigation = () => {
             >
               About
             </Link>
+            <ThemeToggle />
             <Link to="/auth">
               <Button size="sm">Sign In</Button>
             </Link>
@@ -108,6 +110,10 @@ const Navigation = () => {
             >
               About
             </Link>
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Theme</span>
+              <ThemeToggle />
+            </div>
             <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
               <Button size="sm" className="w-full">Sign In</Button>
             </Link>
