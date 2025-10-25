@@ -8,6 +8,18 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Html5Qrcode } from "html5-qrcode";
 
+interface HealthRisk {
+  nutrient: string;
+  risk: string;
+  explanation: string;
+}
+
+interface Alternative {
+  name: string;
+  why_better: string;
+  how_helps: string;
+}
+
 interface ProductResult {
   name: string;
   brand: string;
@@ -19,6 +31,8 @@ interface ProductResult {
     additives: number;
   };
   image?: string;
+  healthRisks?: HealthRisk[];
+  alternatives?: Alternative[];
 }
 
 const Scan = () => {
@@ -304,6 +318,61 @@ const Scan = () => {
                 </div>
               </div>
             </Card>
+
+            {/* Health Risk Profile */}
+            {result.healthRisks && result.healthRisks.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  🚨 Health Risk Profile
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-3 px-2 font-semibold">Nutrient of Concern</th>
+                        <th className="text-left py-3 px-2 font-semibold">Associated Health Risks</th>
+                        <th className="text-left py-3 px-2 font-semibold">How It Affects You</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {result.healthRisks.map((risk, index) => (
+                        <tr key={index} className="border-b last:border-0">
+                          <td className="py-3 px-2 font-medium">{risk.nutrient}</td>
+                          <td className="py-3 px-2">{risk.risk}</td>
+                          <td className="py-3 px-2 text-muted-foreground">{risk.explanation}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            )}
+
+            {/* Healthier Alternatives */}
+            {result.alternatives && result.alternatives.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  ✅ Healthier Alternatives to Try
+                </h3>
+                <div className="space-y-4">
+                  {result.alternatives.map((alt, index) => (
+                    <div key={index} className="border-l-4 border-primary pl-4 py-2">
+                      <h4 className="font-semibold text-base mb-2 flex items-center gap-2">
+                        ✨ {alt.name}
+                      </h4>
+                      <p className="text-sm mb-1">
+                        <span className="font-medium">Why it's better:</span>{" "}
+                        <span className="text-muted-foreground">{alt.why_better}</span>
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-medium">How it helps:</span>{" "}
+                        <span className="text-muted-foreground">{alt.how_helps}</span>
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
           </div>
         )}
       </div>

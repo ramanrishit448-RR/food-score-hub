@@ -39,7 +39,7 @@ serve(async (req) => {
     const nutriscore_grade = product.nutriscore_grade || '';
 
     // Prepare data for AI analysis
-    const analysisPrompt = `Analyze this food product and provide a health score from 0-10:
+    const analysisPrompt = `You are a friendly and expert dietary assistant. Analyze this food product and provide detailed health risk analysis and healthier alternatives.
 
 Product: ${product.product_name || 'Unknown'}
 Brand: ${product.brands || 'Unknown'}
@@ -58,7 +58,7 @@ Additional Info:
 - NOVA Group: ${nova_group} (1=unprocessed, 4=ultra-processed)
 - Nutri-Score: ${nutriscore_grade.toUpperCase() || 'N/A'}
 - Number of Additives: ${additives.length}
-- Ingredients Preview: ${ingredients.substring(0, 200)}
+- Ingredients: ${ingredients.substring(0, 300)}
 
 Please analyze and return ONLY a JSON object (no markdown, no extra text) with this exact structure:
 {
@@ -66,7 +66,21 @@ Please analyze and return ONLY a JSON object (no markdown, no extra text) with t
   "recommendation": "<EAT|BUY|AVOID>",
   "nutrition_score": <number 0-10>,
   "ingredient_quality": <number 0-10>,
-  "additives_score": <number 0-10>
+  "additives_score": <number 0-10>,
+  "health_risks": [
+    {
+      "nutrient": "string (e.g., High Fructose Corn Syrup)",
+      "risk": "string (e.g., Weight Gain & Type 2 Diabetes)",
+      "explanation": "string (brief one-sentence explanation)"
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "string (alternative product name)",
+      "why_better": "string (key nutritional benefit)",
+      "how_helps": "string (positive health outcome)"
+    }
+  ]
 }
 
 Scoring guidelines:
@@ -74,7 +88,9 @@ Scoring guidelines:
 - recommendation: EAT (score 7+), BUY (score 4-6), AVOID (score 0-3)
 - nutrition_score: Based on macro/micronutrients balance
 - ingredient_quality: Based on processing level and ingredient list
-- additives_score: Penalize for number and type of additives`;
+- additives_score: Penalize for number and type of additives
+- health_risks: Array of 3-5 specific nutrients of concern with their risks and explanations
+- alternatives: Array of 3-5 healthier product alternatives with specific reasons`;
 
     // Call Lovable AI for analysis
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -128,7 +144,9 @@ Scoring guidelines:
         recommendation: fallbackScore >= 7 ? 'EAT' : fallbackScore >= 4 ? 'BUY' : 'AVOID',
         nutrition_score: fallbackScore,
         ingredient_quality: Math.max(1, 10 - nova_group * 2),
-        additives_score: Math.max(1, 10 - additives.length * 0.5)
+        additives_score: Math.max(1, 10 - additives.length * 0.5),
+        health_risks: [],
+        alternatives: []
       };
     }
 
@@ -181,6 +199,8 @@ Scoring guidelines:
         additives: analysisResult.additives_score,
       },
       image: product.image_url || null,
+      healthRisks: analysisResult.health_risks || [],
+      alternatives: analysisResult.alternatives || [],
     };
 
     console.log('Analysis complete:', result);
