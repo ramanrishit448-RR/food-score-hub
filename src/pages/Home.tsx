@@ -81,6 +81,101 @@ const Home = () => {
         </div>
       </section>
 
+      {/* What Makes Us Different Section */}
+      <section className="py-20 px-4 bg-gradient-to-br from-primary/5 to-accent/5">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">What Makes FoodSight AI Different?</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              We go beyond basic nutrition scores to give you the full picture—including what's harmful and what's better.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            {/* Health Risk Analysis */}
+            <Card className="p-8 border-2 hover:shadow-xl transition-all">
+              <div className="mb-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-destructive/10 mb-4">
+                  <Shield className="h-8 w-8 text-destructive" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">Detailed Health Risk Profile</h3>
+                <p className="text-muted-foreground mb-4">
+                  Most apps just give you a score. We tell you <strong>exactly what's harmful</strong> and why it matters.
+                </p>
+              </div>
+              
+              <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-destructive mt-2"></div>
+                  <div>
+                    <p className="font-semibold text-sm">Nutrient of Concern</p>
+                    <p className="text-xs text-muted-foreground">High Fructose Corn Syrup, Saturated Fat, Sodium</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-destructive mt-2"></div>
+                  <div>
+                    <p className="font-semibold text-sm">Associated Health Risk</p>
+                    <p className="text-xs text-muted-foreground">Weight Gain, Type 2 Diabetes, Heart Disease</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-destructive mt-2"></div>
+                  <div>
+                    <p className="font-semibold text-sm">How It Affects You</p>
+                    <p className="text-xs text-muted-foreground">Clear explanations linking ingredients to real health impacts</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Alternative Recommendations */}
+            <Card className="p-8 border-2 hover:shadow-xl transition-all">
+              <div className="mb-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+                  <Zap className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">Smarter Alternative Recommendations</h3>
+                <p className="text-muted-foreground mb-4">
+                  We don't just say "avoid it"—we show you <strong>healthier swaps</strong> with clear reasons why they're better.
+                </p>
+              </div>
+              
+              <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
+                  <div>
+                    <p className="font-semibold text-sm">Alternative Name</p>
+                    <p className="text-xs text-muted-foreground">Specific product recommendations, not vague suggestions</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
+                  <div>
+                    <p className="font-semibold text-sm">Why It's Better</p>
+                    <p className="text-xs text-muted-foreground">Key nutritional benefits explained simply</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
+                  <div>
+                    <p className="font-semibold text-sm">How It Helps</p>
+                    <p className="text-xs text-muted-foreground">Positive health outcomes you'll actually experience</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="text-center">
+            <p className="text-lg font-semibold mb-2">The FoodSight Difference</p>
+            <p className="text-muted-foreground">
+              Complete transparency. Actionable insights. Real alternatives. That's intelligence you can trust.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-4xl text-center">
