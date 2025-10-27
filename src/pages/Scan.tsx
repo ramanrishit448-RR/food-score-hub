@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,21 +37,43 @@ interface ProductResult {
 }
 
 const Scan = () => {
+  const navigate = useNavigate();
   const [barcode, setBarcode] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ProductResult | null>(null);
   const [scanMode, setScanMode] = useState<"manual" | "camera">("manual");
   const [isScanning, setIsScanning] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const scannerDivId = "barcode-scanner";
 
   useEffect(() => {
+    // Check authentication status
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        toast.error("Please sign in to scan products");
+        navigate("/auth");
+      } else {
+        setUser(session.user);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        navigate("/auth");
+      }
+      if (session?.user) {
+        setUser(session.user);
+      }
+    });
+
     return () => {
+      subscription.unsubscribe();
       if (scannerRef.current && isScanning) {
         scannerRef.current.stop().catch(console.error);
       }
     };
-  }, [isScanning]);
+  }, [isScanning, navigate]);
 
   const handleScan = async () => {
     if (!barcode.trim()) {
@@ -58,16 +81,27 @@ const Scan = () => {
       return;
     }
 
+    if (!user) {
+      toast.error("Please sign in to scan products");
+      navigate("/auth");
+      return;
+    }
+
     setLoading(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const { data, error } = await supabase.functions.invoke('analyze-product', {
-        body: { barcode }
+        body: { barcode },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
       });
 
       if (error) throw error;
 
       setResult(data);
-      toast.success("Product analyzed successfully!");
+      toast.success("Product analyzed and saved to your dashboard!");
     } catch (error) {
       console.error("Error analyzing product:", error);
       toast.error("Failed to analyze product. Please try again.");
