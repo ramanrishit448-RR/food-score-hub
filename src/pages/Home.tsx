@@ -18,12 +18,12 @@ const Home = () => {
           </div>
           
           <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            Make <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Healthier Choices</span> With Every Scan
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">See Beyond the Label</span>
           </h1>
           
           <p className="text-xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Instantly analyze any food product's nutritional value with our AI-powered scanner. 
-            Get clear recommendations: EAT, BUY, or AVOID.
+            FoodSight AI brings clarity to your food choices. Scan any product and get instant, 
+            intelligent insights: EAT, BUY, or AVOID.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
@@ -45,7 +45,7 @@ const Home = () => {
       {/* Features Section */}
       <section className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose NutriScan AI?</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Why Choose FoodSight AI?</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="p-6 hover:shadow-lg transition-shadow">
@@ -99,7 +99,7 @@ const Home = () => {
       {/* Footer */}
       <footer className="border-t py-8 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2025 NutriScan AI. Making nutrition simple.</p>
+          <p>&copy; 2025 FoodSight AI. See Beyond the Label.</p>
         </div>
       </footer>
     </div>

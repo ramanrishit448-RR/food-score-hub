@@ -9,9 +9,9 @@ const About = () => {
       
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">About NutriScan AI</h1>
+          <h1 className="text-4xl font-bold mb-4">About FoodSight AI</h1>
           <p className="text-xl text-muted-foreground">
-            Making nutritious food choices simple and accessible for everyone
+            Bringing clarity and intelligence to every food decision
           </p>
         </div>
 
@@ -24,10 +24,10 @@ const About = () => {
             <div>
               <h2 className="text-2xl font-bold mb-3">Our Mission</h2>
               <p className="text-muted-foreground leading-relaxed">
-                At NutriScan AI, we believe everyone deserves to make informed decisions about their nutrition. 
-                Our mission is to empower consumers with instant, AI-powered insights into the foods they buy, 
-                making healthy eating accessible and straightforward. We're democratizing nutritional knowledge, 
-                one scan at a time.
+                At FoodSight AI, we believe everyone deserves clarity in their food choices. 
+                Our mission is to empower consumers with instant, intelligent insights into the foods they buy, 
+                cutting through marketing hype and confusing labels. We provide the foresight you need to make 
+                better decisions for your health—one scan at a time.
               </p>
             </div>
           </div>
@@ -87,17 +87,17 @@ const About = () => {
         <Card className="p-8 mt-8 bg-gradient-to-br from-primary/5 to-accent/5">
           <h2 className="text-2xl font-bold mb-4">Meet the Creator</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            NutriScan AI was created by a team of nutrition enthusiasts and AI developers who 
+            FoodSight AI was created by a team of nutrition enthusiasts and AI developers who 
             experienced firsthand the challenge of making healthy food choices in today's complex 
             food landscape. After countless hours navigating confusing nutrition labels and 
-            contradictory health advice, we decided to build a solution that makes nutritional 
-            decision-making simple and instant.
+            contradictory health advice, we decided to build a solution that provides true insight—
+            giving you the clarity and foresight to make smarter decisions instantly.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            Our goal is to help millions of people worldwide make better food choices, reduce 
-            consumption of ultra-processed foods, and ultimately lead healthier lives. We're 
-            continuously improving our AI algorithm to provide the most accurate and helpful 
-            nutritional guidance possible.
+            Our goal is to help millions of people worldwide see their food with new eyes, 
+            reduce consumption of ultra-processed foods, and ultimately lead healthier lives. 
+            We're continuously improving our AI to provide the most accurate and helpful 
+            nutritional intelligence possible.
           </p>
         </Card>
       </div>

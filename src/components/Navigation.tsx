@@ -18,7 +18,7 @@ const Navigation = () => {
           <Link to="/" className="flex items-center gap-2 font-bold text-xl">
             <ScanBarcode className="h-6 w-6 text-primary" />
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              NutriScan AI
+              FoodSight AI
             </span>
           </Link>
 

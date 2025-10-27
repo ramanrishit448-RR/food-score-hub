@@ -84,7 +84,7 @@ const Auth = () => {
           <div className="flex items-center justify-center gap-2 mb-4">
             <ScanBarcode className="h-8 w-8 text-primary" />
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              NutriScan AI
+              FoodSight AI
             </span>
           </div>
           <p className="text-muted-foreground">Sign in to track your nutrition journey</p>
