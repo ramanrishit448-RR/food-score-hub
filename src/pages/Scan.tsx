@@ -7,7 +7,7 @@ import { ScanBarcode, Loader2, Camera, Keyboard } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Html5Qrcode } from "html5-qrcode";
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 
 interface HealthRisk {
   nutrient: string;
@@ -86,9 +86,19 @@ const Scan = () => {
     }
   }, [scanMode]);
 
-  const handleScan = async () => {
-    if (!barcode.trim()) {
+  const handleScan = async (value?: string) => {
+    const raw = value ?? barcode;
+    const cleaned = raw.trim();
+
+    if (!cleaned) {
       toast.error("Please enter a barcode");
+      return;
+    }
+
+    // Basic numeric validation for common EAN/UPC lengths
+    const digitsOnly = cleaned.replace(/\D/g, "");
+    if (!/^\d{8,14}$/.test(digitsOnly)) {
+      toast.error("Invalid barcode. Use 8–14 digits (EAN/UPC)");
       return;
     }
 
@@ -101,9 +111,9 @@ const Scan = () => {
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       const { data, error } = await supabase.functions.invoke('analyze-product', {
-        body: { barcode },
+        body: { barcode: digitsOnly },
         headers: {
           Authorization: `Bearer ${session?.access_token}`
         }
@@ -113,9 +123,10 @@ const Scan = () => {
 
       setResult(data);
       toast.success("Product analyzed and saved to your dashboard!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error analyzing product:", error);
-      toast.error("Failed to analyze product. Please try again.");
+      const msg = error?.message || "Failed to analyze product. Please try again.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -235,7 +246,7 @@ const Scan = () => {
                   />
                 </div>
                 <Button 
-                  onClick={handleScan} 
+                  onClick={() => handleScan()} 
                   disabled={loading}
                   size="lg"
                   className="gap-2"
