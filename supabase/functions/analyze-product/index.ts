@@ -164,23 +164,30 @@ CRITICAL:
 
       // Save scan to database if user is authenticated
       if (userId) {
-        const { error: insertError } = await supabase.from('scans').insert({
-          user_id: userId,
-          barcode,
-          product_name: product.product_name || 'Unknown Product',
-          brand: product.brands || null,
-          health_score: analysisResult.health_score,
-          recommendation: analysisResult.recommendation,
-          nutrition_score: analysisResult.nutrition_score,
-          ingredient_quality: analysisResult.ingredient_quality,
-          additives_score: analysisResult.additives_score,
-          product_image: product.image_url || null,
-        });
-
-        if (insertError) {
-          console.error('Error saving scan:', insertError);
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+        const supabaseServiceUrl = Deno.env.get('SUPABASE_URL')!;
+        if (!supabaseServiceKey) {
+          console.error('Missing SUPABASE_SERVICE_ROLE_KEY; cannot persist scan');
         } else {
-          console.log('Scan saved successfully for user:', userId);
+          const supabaseService = createClient(supabaseServiceUrl, supabaseServiceKey);
+          const { error: insertError } = await supabaseService.from('scans').insert({
+            user_id: userId,
+            barcode,
+            product_name: product.product_name || 'Unknown Product',
+            brand: product.brands || null,
+            health_score: analysisResult.health_score,
+            recommendation: analysisResult.recommendation,
+            nutrition_score: analysisResult.nutrition_score,
+            ingredient_quality: analysisResult.ingredient_quality,
+            additives_score: analysisResult.additives_score,
+            product_image: product.image_url || null,
+          });
+
+          if (insertError) {
+            console.error('Error saving scan:', insertError);
+          } else {
+            console.log('Scan saved successfully for user:', userId);
+          }
         }
       } else {
         console.log('No authenticated user; skipping save.');
