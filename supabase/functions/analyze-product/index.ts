@@ -144,7 +144,8 @@ CRITICAL:
     }
 
     // Get user from auth header
-    const authHeader = req.headers.get('authorization');
+    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
+    console.log('Auth header present:', Boolean(authHeader));
     let userId = null;
     
     if (authHeader) {
@@ -154,8 +155,12 @@ CRITICAL:
         global: { headers: { Authorization: authHeader } }
       });
 
-      const { data: { user } } = await supabase.auth.getUser();
-      userId = user?.id;
+      const { data: { user }, error: getUserError } = await supabase.auth.getUser();
+      if (getUserError) {
+        console.error('getUser error:', getUserError);
+      }
+      userId = user?.id || null;
+      console.log('Resolved user id:', userId);
 
       // Save scan to database if user is authenticated
       if (userId) {
@@ -177,7 +182,11 @@ CRITICAL:
         } else {
           console.log('Scan saved successfully for user:', userId);
         }
+      } else {
+        console.log('No authenticated user; skipping save.');
       }
+    } else {
+      console.log('No Authorization header; skipping save.');
     }
 
     // Return results
