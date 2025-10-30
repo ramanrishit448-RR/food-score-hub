@@ -75,6 +75,17 @@ const Scan = () => {
     };
   }, [isScanning, navigate]);
 
+  // Start camera when scan mode changes to camera
+  useEffect(() => {
+    if (scanMode === "camera" && !isScanning) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        startCameraScanning();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [scanMode]);
+
   const handleScan = async () => {
     if (!barcode.trim()) {
       toast.error("Please enter a barcode");
@@ -156,7 +167,7 @@ const Scan = () => {
       setScanMode("manual");
     } else {
       setScanMode("camera");
-      startCameraScanning();
+      // Camera will start automatically via useEffect
     }
   };
 
