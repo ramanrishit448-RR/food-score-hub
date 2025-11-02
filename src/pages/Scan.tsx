@@ -143,7 +143,14 @@ const Scan = () => {
         {
           fps: 10,
           qrbox: { width: 250, height: 250 },
-        },
+          formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.CODE_128,
+          ],
+        } as any,
         (decodedText) => {
           setBarcode(decodedText);
           stopCameraScanning();
@@ -281,7 +288,7 @@ const Scan = () => {
                       className="flex-1"
                     />
                     <Button 
-                      onClick={handleScan} 
+                      onClick={() => handleScan()} 
                       disabled={loading}
                       className="gap-2"
                     >
