@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ScanBarcode, LogOut } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,7 +39,9 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 font-bold text-xl">
-            <ScanBarcode className="h-6 w-6 text-primary" />
+            <div className="h-8 w-8 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
+              Logo
+            </div>
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               FoodSight AI
             </span>
