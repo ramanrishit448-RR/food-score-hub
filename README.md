@@ -1,3 +1,4 @@
+# foodSight AI
 
 **Use your preferred IDE**
 
@@ -44,6 +45,3 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
-
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
