@@ -1,12 +1,35 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ScanBarcode } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, ScanBarcode, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
 import ThemeToggle from "./ThemeToggle";
+import { supabase } from "@/integrations/supabase/client";
+import { User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("Signed out successfully");
+    navigate("/");
+  };
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -57,9 +80,16 @@ const Navigation = () => {
               About
             </Link>
             <ThemeToggle />
-            <Link to="/auth">
-              <Button size="sm">Sign In</Button>
-            </Link>
+            {user ? (
+              <Button size="sm" variant="outline" onClick={handleSignOut} className="gap-2">
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            ) : (
+              <Link to="/auth">
+                <Button size="sm">Sign In</Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -114,9 +144,24 @@ const Navigation = () => {
               <span className="text-muted-foreground">Theme</span>
               <ThemeToggle />
             </div>
-            <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-              <Button size="sm" className="w-full">Sign In</Button>
-            </Link>
+            {user ? (
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="w-full gap-2" 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleSignOut();
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            ) : (
+              <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
+                <Button size="sm" className="w-full">Sign In</Button>
+              </Link>
+            )}
           </div>
         )}
       </div>
