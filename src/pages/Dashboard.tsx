@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { BarChart3, History, LogOut } from "lucide-react";
+import { BarChart3, History, LogOut, Trash2 } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -73,6 +73,41 @@ const Dashboard = () => {
       toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (scanId: string) => {
+    try {
+      const { error } = await supabase
+        .from('scans')
+        .delete()
+        .eq('id', scanId);
+
+      if (error) throw error;
+
+      // Update local state
+      const updatedScans = scans.filter(s => s.id !== scanId);
+      setScans(updatedScans);
+
+      // Recalculate stats
+      if (updatedScans.length > 0) {
+        const totalScans = updatedScans.length;
+        const healthyChoices = updatedScans.filter((s: any) => s.recommendation === 'EAT').length;
+        const avgScore = updatedScans.reduce((sum: number, s: any) => sum + s.health_score, 0) / totalScans;
+
+        setStats({
+          totalScans,
+          healthyChoices,
+          avgScore: Number(avgScore.toFixed(1))
+        });
+      } else {
+        setStats({ totalScans: 0, healthyChoices: 0, avgScore: 0 });
+      }
+
+      toast.success("Scan deleted successfully");
+    } catch (error: any) {
+      console.error('Error deleting scan:', error);
+      toast.error('Failed to delete scan');
     }
   };
 
@@ -198,6 +233,14 @@ const Dashboard = () => {
                       {scan.recommendation}
                     </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(scan.id)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
             </div>
