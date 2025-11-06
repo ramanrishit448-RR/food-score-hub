@@ -171,11 +171,18 @@ const Scan = () => {
   const stopCameraScanning = async () => {
     if (scannerRef.current && isScanning) {
       try {
-        await scannerRef.current.stop();
+        // Check if scanner is actually running before stopping
+        const state = await scannerRef.current.getState();
+        if (state === 2) { // Html5QrcodeScannerState.SCANNING = 2
+          await scannerRef.current.stop();
+        }
         scannerRef.current = null;
         setIsScanning(false);
       } catch (error) {
         console.error("Error stopping scanner:", error);
+        // Reset state even if stop fails
+        scannerRef.current = null;
+        setIsScanning(false);
       }
     }
   };
@@ -188,6 +195,13 @@ const Scan = () => {
       setScanMode("camera");
       // Camera will start automatically via useEffect
     }
+  };
+
+  const switchToMode = (mode: "manual" | "camera" | "voice") => {
+    if (scanMode === "camera" && mode !== "camera") {
+      stopCameraScanning();
+    }
+    setScanMode(mode);
   };
 
   const getScoreColor = (score: number) => {
@@ -221,10 +235,7 @@ const Scan = () => {
           <div className="flex gap-2 mb-4">
             <Button
               variant={scanMode === "manual" ? "default" : "outline"}
-              onClick={() => {
-                stopCameraScanning();
-                setScanMode("manual");
-              }}
+              onClick={() => switchToMode("manual")}
               className="flex-1 gap-2"
             >
               <Keyboard className="h-4 w-4" />
@@ -240,10 +251,7 @@ const Scan = () => {
             </Button>
             <Button
               variant={scanMode === "voice" ? "default" : "outline"}
-              onClick={() => {
-                stopCameraScanning();
-                setScanMode("voice");
-              }}
+              onClick={() => switchToMode("voice")}
               className="flex-1 gap-2"
             >
               <Mic className="h-4 w-4" />
