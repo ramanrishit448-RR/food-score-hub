@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ScanBarcode, Loader2, Camera, Keyboard } from "lucide-react";
+import { ScanBarcode, Loader2, Camera, Keyboard, Mic } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
+import VoiceScanner from "@/components/VoiceScanner";
 
 interface HealthRisk {
   nutrient: string;
@@ -41,7 +42,7 @@ const Scan = () => {
   const [barcode, setBarcode] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ProductResult | null>(null);
-  const [scanMode, setScanMode] = useState<"manual" | "camera">("manual");
+  const [scanMode, setScanMode] = useState<"manual" | "camera" | "voice">("manual");
   const [isScanning, setIsScanning] = useState(false);
   const [user, setUser] = useState<any>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
@@ -237,6 +238,17 @@ const Scan = () => {
               <Camera className="h-4 w-4" />
               Camera
             </Button>
+            <Button
+              variant={scanMode === "voice" ? "default" : "outline"}
+              onClick={() => {
+                stopCameraScanning();
+                setScanMode("voice");
+              }}
+              className="flex-1 gap-2"
+            >
+              <Mic className="h-4 w-4" />
+              Voice
+            </Button>
           </div>
 
           {scanMode === "manual" ? (
@@ -270,7 +282,7 @@ const Scan = () => {
                 Try example: 3017620422003 (Nutella)
               </p>
             </>
-          ) : (
+          ) : scanMode === "camera" ? (
             <>
               <div 
                 id={scannerDivId} 
@@ -303,6 +315,13 @@ const Scan = () => {
                 </div>
               )}
             </>
+          ) : (
+            <VoiceScanner 
+              onBarcodeDetected={(detectedBarcode) => {
+                setBarcode(detectedBarcode);
+                handleScan(detectedBarcode);
+              }} 
+            />
           )}
         </Card>
 
