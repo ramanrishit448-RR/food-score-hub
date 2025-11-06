@@ -19,13 +19,16 @@ export type Database = {
           additives_score: number | null
           barcode: string
           brand: string | null
+          carbs: number | null
           created_at: string
+          fat: number | null
           health_score: number
           id: string
           ingredient_quality: number | null
           nutrition_score: number | null
           product_image: string | null
           product_name: string
+          protein: number | null
           recommendation: string
           user_id: string
         }
@@ -33,13 +36,16 @@ export type Database = {
           additives_score?: number | null
           barcode: string
           brand?: string | null
+          carbs?: number | null
           created_at?: string
+          fat?: number | null
           health_score: number
           id?: string
           ingredient_quality?: number | null
           nutrition_score?: number | null
           product_image?: string | null
           product_name: string
+          protein?: number | null
           recommendation: string
           user_id: string
         }
@@ -47,13 +53,16 @@ export type Database = {
           additives_score?: number | null
           barcode?: string
           brand?: string | null
+          carbs?: number | null
           created_at?: string
+          fat?: number | null
           health_score?: number
           id?: string
           ingredient_quality?: number | null
           nutrition_score?: number | null
           product_image?: string | null
           product_name?: string
+          protein?: number | null
           recommendation?: string
           user_id?: string
         }

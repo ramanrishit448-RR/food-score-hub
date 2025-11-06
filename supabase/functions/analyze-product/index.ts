@@ -180,6 +180,9 @@ CRITICAL:
             ingredient_quality: analysisResult.ingredient_quality,
             additives_score: analysisResult.additives_score,
             product_image: product.image_url || null,
+            carbs: nutriments.carbohydrates_100g || null,
+            protein: nutriments.proteins_100g || null,
+            fat: nutriments.fat_100g || null,
           });
 
           if (insertError) {

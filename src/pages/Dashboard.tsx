@@ -6,6 +6,7 @@ import Navigation from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarChart3, History, LogOut, Trash2 } from "lucide-react";
+import ChartsSection from "@/components/dashboard/ChartsSection";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -149,6 +150,9 @@ const Dashboard = () => {
             Sign Out
           </Button>
         </div>
+
+        {/* Charts Section */}
+        <ChartsSection scans={scans} latestScan={scans[0]} />
 
         {/* Stats Overview */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">

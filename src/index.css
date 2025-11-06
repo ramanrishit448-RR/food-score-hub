@@ -57,6 +57,11 @@ All colors MUST be HSL.
     --shadow-card: 0 4px 6px -1px hsl(160 84% 39% / 0.1), 0 2px 4px -2px hsl(160 84% 39% / 0.1);
     --shadow-button: 0 10px 15px -3px hsl(160 84% 39% / 0.3);
 
+    /* Chart colors */
+    --chart-1: 160 84% 39%;
+    --chart-2: 142 76% 36%;
+    --chart-3: 38 92% 50%;
+
     /* Animation timing */
     --transition-base: 0.2s ease-out;
     --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
