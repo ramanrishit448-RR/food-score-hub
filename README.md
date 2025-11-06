@@ -144,4 +144,18 @@ React Dashboard (Charts + Insights)
 
 ---
 
-Would you like me to generate a **visual architecture diagram (PNG or SVG)** next based on this layout so you can include it directly in your README?
+### 🤝 **Collaboration**
+
+> "I'm open to collaborating on AI-driven food health analysis projects. Let's build something amazing together!"
+
+---
+
+### 📫 **Contact**
+
+> "If you're interested in working together or have any questions, don't hesitate to reach out! Let's create something amazing together!"
+
+> "Best regards, RISHIT RAMAN"
+
+---
+
+### 🌟 **Thank You**
