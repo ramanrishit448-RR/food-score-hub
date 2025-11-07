@@ -97,7 +97,6 @@ FoodScore Hub is an AI-integrated web application that helps users understand ho
 ✅ Real-world problem with measurable impact.
 ✅ Clean architecture (Supabase Edge + Gemini integration).
 ✅ Strong emphasis on UI/UX and data-driven storytelling.
-✅ Scalable for future expansion (OCR, multilingual support, voice interface).
 
 ---
 
@@ -123,18 +122,6 @@ Supabase Database (Users, Scans)
      ↓
 React Dashboard (Charts + Insights)
 ```
-
----
-
-### 📢 **How to Present It on GitHub / LinkedIn**
-
-- Add **screenshots** (Scan Screen, Health Report, Dashboard).
-- Pin a **30-sec demo video** (barcode scan → AI result → dashboard).
-- Include a **section on learning outcomes**:
-
-  > "Built a full-stack AI-driven web app integrating Gemini 2.5 Flash, Supabase, and Open Food Facts to evaluate product health scores with explainable AI."
-
-- Add badges for tech stack (React, Supabase, Gemini, Tailwind, Vite).
 
 ---
 
