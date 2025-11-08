@@ -15,4 +15,9 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Ensure env variables are available even if .env hot-reload didn't apply
+  define: {
+    'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(process.env.VITE_SUPABASE_URL || 'https://cinrrfxtvsuqdjsjkiex.supabase.co'),
+    'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(process.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpbnJyZnh0dnN1cWRqc2praWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4OTgyNTAsImV4cCI6MjA3NjQ3NDI1MH0.Lot7CPXrH8-jsTTnggZx-jnaPdRNMF_ECry5_SsKmeU'),
+  },
 }));
