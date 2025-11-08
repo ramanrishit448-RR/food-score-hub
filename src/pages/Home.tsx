@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScanBarcode, Shield, Zap, Users } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { VoiceAssistant } from "@/components/VoiceAssistant";
 
 const Home = () => {
   return (
@@ -173,6 +174,19 @@ const Home = () => {
               Complete transparency. Actionable insights. Real alternatives. That's intelligence you can trust.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Voice Assistant Section */}
+      <section className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-4">Ask Our AI Nutrition Assistant</h2>
+            <p className="text-xl text-muted-foreground">
+              Get instant answers to your nutrition questions using voice commands.
+            </p>
+          </div>
+          <VoiceAssistant />
         </div>
       </section>
 
