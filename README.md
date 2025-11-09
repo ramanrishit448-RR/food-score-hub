@@ -1,148 +1,132 @@
-## 🧩 FoodSight AI — Enhanced Architecture & README
+# 🧩 FoodScore Hub — AI-Powered Food Health Analyzer
 
-### ⚙️ **System Architecture Diagram**
+## 🚀 Overview
 
-**Frontend (React + Vite + Tailwind + TypeScript)**
+FoodScore Hub is an AI-integrated web app that helps users understand the healthiness of their food. Users can scan barcodes or speak directly to the app using the **Voice Interaction feature**, and Gemini 2.5 Flash analyzes the product to generate a **health score (0–10)**, nutritional insights, and visual analytics.
 
-- Handles barcode scanning and user interaction.
-- Displays product details, AI-generated health scores, explanations, and visual analytics.
-- Implements authentication (via Supabase Auth) for personalized user history.
-- Uses Chart.js/Recharts for visualizing nutrition data and user stats.
-
-**↓ REST API Communication (HTTPS)**
-
-**Backend (Supabase Edge Function + Deno + TypeScript)**
-
-- Accepts requests from frontend containing product barcode.
-- Fetches product details from **Open Food Facts API**.
-- Passes structured product data to **Gemini 2.5 Flash** for analysis.
-- Generates:
-
-  - Health Score (0–10)
-  - AI Reasoning ("Why this score")
-  - Recommended Healthier Alternatives
-
-- Stores user scan data and results in **Supabase Database (Postgres)**.
-
-**↓ Database Interaction (Supabase SDK)**
-
-**Supabase Database (Postgres)**
-
-- `users` table — Authenticated user profiles.
-- `scans` table — Stores scanned products, scores, explanations, and timestamps.
-- `analytics` view — Aggregated user insights (e.g., avg health score, category trends).
-
-**↓ AI Analysis Layer**
-
-**Gemini 2.5 Flash (via Google Generative API)**
-
-- Input: product data (nutrients, ingredients, category)
-- Output: health rating + human-like reasoning paragraph
-- Optionally returns product comparisons / healthier alternatives.
-
-**↓ External Data Source**
-
-**Open Food Facts API**
-
-- Provides detailed nutritional info for barcodes scanned by users.
+This project combines AI, data visualization, and full-stack development (MERN + Supabase Edge Functions + Gemini) to deliver a smart, user-friendly health assistant.
 
 ---
 
-### 🧠 **Enhanced Project Overview (For README)**
+## 🧠 Key Features
 
-#### **🔹 Project Title:** FoodScore Hub — AI-Powered Food Health Analyzer
+| Feature                | Description                                               | Tech Used                         |
+| ---------------------- | --------------------------------------------------------- | --------------------------------- |
+| **AI Health Analysis** | Gemini 2.5 Flash rates food health and explains reasoning | Gemini 2.5 Flash, Open Food Facts |
 
-#### **🚀 Overview**
+| **Voice Interaction** | Users can literally talk to the app: “Tell me if this food is healthy,” and Gemini responds by voice | Web Speech API, SpeechSynthesis, Gemini 2.5 Flash |
 
-FoodScore Hub is an AI-integrated web application that helps users understand how healthy their food choices are. Simply scan a barcode, and the app analyzes the product’s nutritional profile using **Gemini 2.5 Flash**, returning a **Health Score (0–10)** and an **AI-driven explanation** of why it scored that way.
+| **Smart Recommendations** | Suggests healthier alternatives based on scanned product | Gemini + Open Food Facts |
 
-#### **✨ Key Features**
+| **User Authentication** | Secure login and personalized dashboard | Supabase Auth |
 
-| Feature                    | Description                                                                | Tech Used                         |
-| -------------------------- | -------------------------------------------------------------------------- | --------------------------------- |
-| **AI Health Analysis**     | Uses Gemini 2.5 Flash to rate and explain a food’s healthiness             | Gemini 2.5 Flash, Open Food Facts |
-| **Smart Recommendations**  | Suggests healthier alternatives within the same category                   | Gemini + Open Food Facts          |
-| **User Authentication**    | Users can sign up, log in, and track scan history                          | Supabase Auth                     |
-| **Personalized Dashboard** | Visual charts showing trends in scanned products and average health scores | React, Recharts                   |
-| **AI Explanation**         | Gemini explains reasoning behind each score                                | Gemini API                        |
-| **Offline Support (PWA)**  | Last few scans available offline                                           | Service Worker                    |
-| **Admin Panel**            | Shows analytics across all user data                                       | Supabase + Admin Dashboard        |
+| **Visual Dashboard** | Interactive charts for tracking health trends | React, Recharts, Chart.js |
 
----
+| **Pie Chart** | Shows macronutrient breakdown (Carbs, Protein, Fat) | Recharts |
 
-### 🧰 **Tech Stack**
+| **Bar Chart** | Displays user health score trends over time | Recharts |
 
-**Frontend:** React, Vite, TypeScript, TailwindCSS, Recharts
-**Backend:** Supabase Edge Functions (Deno), Gemini 2.5 Flash API, Open Food Facts API
-**Database:** Supabase (PostgreSQL)
-**Auth:** Supabase Auth
-**AI:** Gemini 2.5 Flash (Health Scoring + Explanation Generation)
+| **Gauge Chart** | Shows current product’s health score visually (0–10) | Recharts / Chart.js |
+
+| **Admin Panel** | Manage global analytics and user data | Supabase + Dashboard UI |
 
 ---
 
-### 🧩 **System Flow (Step-by-Step)**
+## ⚙️ Tech Stack
 
-1. User scans barcode → React frontend extracts code.
-2. Frontend sends barcode → Supabase Edge Function.
-3. Backend fetches product data from Open Food Facts.
-4. Gemini AI analyzes nutrition → returns score + explanation.
-5. Result stored in Supabase DB + shown on user dashboard.
-6. Dashboard visualizes user’s scan history, trends, and insights.
-
----
-
-### 🎯 **Why This Project Stands Out to Recruiters**
-
-✅ Combines AI, data visualization, and full-stack development in one cohesive product.
-✅ Real-world problem with measurable impact.
-✅ Clean architecture (Supabase Edge + Gemini integration).
-✅ Strong emphasis on UI/UX and data-driven storytelling.
+**Frontend:** React, Vite, TypeScript, TailwindCSS, Recharts, Chart.js  
+**Backend:** Supabase Edge Functions (Deno), Gemini 2.5 Flash, Open Food Facts API  
+**Database:** Supabase (PostgreSQL)  
+**Auth:** Supabase Auth  
+**AI:** Gemini 2.5 Flash (for reasoning, voice responses, and recommendations)
 
 ---
 
-### 🧱 **Future Enhancements**
-
-- OCR-based nutrition label reader (upload photo → extract nutrition).
-- Voice query: “Is this product healthy?” → Gemini answers.
-- Multilingual AI explanations (English + Hindi).
-- AI Meal Planner — Suggests daily calorie intake from past scans.
-
----
-
-### 🖼️ **Visual Diagram Summary (Text-based)**
+## 🧩 System Flow
 
 ```
-React (Barcode Scan + UI)
+🎙 User SCAN'S the product
      ↓
-Supabase Edge Function (Deno)
-     ↓      ↘
+Supabase Edge Function processes it → Calls Gemini
+     ↓
+Gemini analyzes food → returns health score + explanation
+     ↓
+Frontend displays:
+  - Product Health Score
+  - Macronutrient Breakdown
+  - Health Trends
+```
+
+---
+
+## 📊 Visual Analytics
+
+### 🥧 **Pie Chart — Macronutrient Breakdown**
+
+Displays the proportion of Carbs, Protein, and Fat from the scanned product.
+
+### 📈 **Bar Chart — Health Score Trends**
+
+Shows changes in health scores over time for each product scanned by the user.
+
+### 🎯 **Gauge Chart — Health Rating Meter (0–10)**
+
+Represents the current product’s AI-generated score visually for quick evaluation.
+
+---
+
+## 🧠 Voice Interaction Feature
+
+The app now supports **natural voice queries** via the Web Speech API.  
+Users can say things like:
+
+- “Is this food healthy?”
+- “Tell me about this product’s sugar content.”
+- “Rate this food for me.”
+
+Gemini responds conversationally and the app reads the answer aloud using the **SpeechSynthesis API**.
+
+---
+
+## 📦 How It Works
+
+1. User scans barcode or speaks query.
+2. The frontend sends a request to Supabase Edge Function.
+3. The backend fetches product data from Open Food Facts.
+4. Gemini analyzes the nutritional values and generates:
+   - Health Score (0–10)
+   - Reasoning (why this score)
+   - Voice-friendly response
+5. The frontend:
+   - Displays product info, AI insights, and charts.
+
+---
+
+## 🧭 Future Enhancements
+
+- OCR-based nutrition label scanning.
+- AI meal planner with personalized suggestions.
+- Multilingual voice interaction (English + Hindi).
+- Exportable health reports (PDF/CSV).
+
+---
+
+## 🖼 Example Architecture
+
+```
+React (Voice + UI + Charts)
+     ↓
+Supabase Edge Functions (Deno)
+     ↓        ↘
 Open Food Facts API   Gemini 2.5 Flash
-     ↓      ↙
-Supabase Database (Users, Scans)
+     ↓        ↙
+Supabase Database (Users, Scans, Health Scores)
      ↓
-React Dashboard (Charts + Insights)
+React Dashboard (Voice + Pie + Bar + Gauge)
 ```
 
 ---
 
-### 💬 **Example README Summary Tagline**
+## 💬 Example Tagline
 
-> "🚀 Full-stack AI project analyzing food health using Gemini 2.5 Flash, Supabase, and Open Food Facts — scan, score, and understand your diet with explainable AI."
-
----
-
-### 🤝 **Collaboration**
-
-> "I'm open to collaborating on AI-driven food health analysis projects. Let's build something amazing together!"
-
----
-
-### 📫 **Contact**
-
-> "If you're interested in working together or have any questions, don't hesitate to reach out! Let's create something amazing together!"
-
-> "Best regards, RISHIT RAMAN"
-
----
-
-### 🌟 **Thank You**
+> "🎙️ Speak to your AI Nutrition Assistant! FoodScore Hub analyzes your food, explains its health score, and visualizes your diet with smart charts — powered by Gemini 2.5 Flash and Supabase Edge."
