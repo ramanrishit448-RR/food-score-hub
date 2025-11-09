@@ -183,6 +183,8 @@ CRITICAL:
             carbs: nutriments.carbohydrates_100g || null,
             protein: nutriments.proteins_100g || null,
             fat: nutriments.fat_100g || null,
+            health_risks: analysisResult.health_risks || [],
+            alternatives: analysisResult.alternatives || [],
           });
 
           if (insertError) {

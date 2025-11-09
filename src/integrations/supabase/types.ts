@@ -17,11 +17,13 @@ export type Database = {
       scans: {
         Row: {
           additives_score: number | null
+          alternatives: Json | null
           barcode: string
           brand: string | null
           carbs: number | null
           created_at: string
           fat: number | null
+          health_risks: Json | null
           health_score: number
           id: string
           ingredient_quality: number | null
@@ -34,11 +36,13 @@ export type Database = {
         }
         Insert: {
           additives_score?: number | null
+          alternatives?: Json | null
           barcode: string
           brand?: string | null
           carbs?: number | null
           created_at?: string
           fat?: number | null
+          health_risks?: Json | null
           health_score: number
           id?: string
           ingredient_quality?: number | null
@@ -51,11 +55,13 @@ export type Database = {
         }
         Update: {
           additives_score?: number | null
+          alternatives?: Json | null
           barcode?: string
           brand?: string | null
           carbs?: number | null
           created_at?: string
           fat?: number | null
+          health_risks?: Json | null
           health_score?: number
           id?: string
           ingredient_quality?: number | null

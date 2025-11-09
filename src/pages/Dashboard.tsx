@@ -375,6 +375,50 @@ const Dashboard = () => {
                 </div>
               )}
 
+              {/* Health Risks */}
+              {selectedScan.health_risks && Array.isArray(selectedScan.health_risks) && selectedScan.health_risks.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-3 text-red-600">⚠️ Health Risks</h4>
+                  <div className="space-y-3">
+                    {selectedScan.health_risks.map((risk: any, idx: number) => (
+                      <Card key={idx} className="p-4 border-red-200 bg-red-50/50">
+                        <div className="flex items-start gap-3">
+                          <div className="text-red-600 text-xl">⚠️</div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-red-900">{risk.nutrient}</div>
+                            <div className="text-sm font-medium text-red-800 mt-1">{risk.risk}</div>
+                            <p className="text-sm text-red-700 mt-2">{risk.explanation}</p>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Healthier Alternatives */}
+              {selectedScan.alternatives && Array.isArray(selectedScan.alternatives) && selectedScan.alternatives.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-3 text-green-600">✨ Healthier Alternatives</h4>
+                  <div className="space-y-3">
+                    {selectedScan.alternatives.map((alt: any, idx: number) => (
+                      <Card key={idx} className="p-4 border-green-200 bg-green-50/50">
+                        <div className="flex items-start gap-3">
+                          <div className="text-green-600 text-xl">✓</div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-green-900">{alt.name}</div>
+                            <div className="text-sm font-medium text-green-800 mt-1">
+                              Why better: {alt.why_better}
+                            </div>
+                            <p className="text-sm text-green-700 mt-2">{alt.how_helps}</p>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Barcode */}
               <div className="text-sm text-muted-foreground">
                 <strong>Barcode:</strong> {selectedScan.barcode}
