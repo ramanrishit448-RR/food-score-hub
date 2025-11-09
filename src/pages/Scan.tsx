@@ -21,6 +21,24 @@ interface Alternative {
   how_helps: string;
 }
 
+interface NutrientLevels {
+  fat?: string;
+  salt?: string;
+  saturated_fat?: string;
+  sugars?: string;
+}
+
+interface Nutriments {
+  energy_100g?: number;
+  fat_100g?: number;
+  saturated_fat_100g?: number;
+  carbohydrates_100g?: number;
+  sugars_100g?: number;
+  fiber_100g?: number;
+  proteins_100g?: number;
+  salt_100g?: number;
+}
+
 interface ProductResult {
   name: string;
   brand: string;
@@ -34,6 +52,8 @@ interface ProductResult {
   image?: string;
   healthRisks?: HealthRisk[];
   alternatives?: Alternative[];
+  nutrientLevels?: NutrientLevels;
+  nutriments?: Nutriments;
 }
 
 const Scan = () => {
@@ -203,6 +223,34 @@ const Scan = () => {
     return "bg-red-100 text-red-800 border-red-300";
   };
 
+  const getNutrientLevelBadge = (level?: string) => {
+    if (!level) return null;
+    const levelLower = level.toLowerCase();
+    
+    if (levelLower === "low") {
+      return (
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-800 border border-green-300 text-sm font-medium">
+          <span className="text-green-600">✓</span> Low
+        </div>
+      );
+    }
+    if (levelLower === "moderate") {
+      return (
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300 text-sm font-medium">
+          <span className="text-yellow-600">⚠</span> Moderate
+        </div>
+      );
+    }
+    if (levelLower === "high") {
+      return (
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-800 border border-red-300 text-sm font-medium">
+          <span className="text-red-600">⊗</span> High
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -336,6 +384,105 @@ const Scan = () => {
                 {result.recommendation}
               </div>
             </Card>
+
+            {/* Nutrient Levels & Nutrition Facts Grid */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Nutrient Levels */}
+              {result.nutrientLevels && (
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <span className="text-red-500">♥</span> Nutrient Levels
+                  </h3>
+                  <div className="space-y-3">
+                    {result.nutrientLevels.fat && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Fat</span>
+                        {getNutrientLevelBadge(result.nutrientLevels.fat)}
+                      </div>
+                    )}
+                    {result.nutrientLevels.salt && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Salt</span>
+                        {getNutrientLevelBadge(result.nutrientLevels.salt)}
+                      </div>
+                    )}
+                    {result.nutrientLevels.saturated_fat && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Saturated Fat</span>
+                        {getNutrientLevelBadge(result.nutrientLevels.saturated_fat)}
+                      </div>
+                    )}
+                    {result.nutrientLevels.sugars && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Sugars</span>
+                        {getNutrientLevelBadge(result.nutrientLevels.sugars)}
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              )}
+
+              {/* Key Nutrition Facts */}
+              {result.nutriments && (
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <span className="text-yellow-500">⚡</span> Key Nutrition Facts (per 100g)
+                  </h3>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                    {result.nutriments.energy_100g !== undefined && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Energy</span>
+                          <span className="font-semibold">{result.nutriments.energy_100g} kcal</span>
+                        </div>
+                      </>
+                    )}
+                    {result.nutriments.proteins_100g !== undefined && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Protein</span>
+                        <span className="font-semibold">{result.nutriments.proteins_100g}g</span>
+                      </div>
+                    )}
+                    {result.nutriments.fat_100g !== undefined && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Fat</span>
+                        <span className="font-semibold">{result.nutriments.fat_100g}g</span>
+                      </div>
+                    )}
+                    {result.nutriments.carbohydrates_100g !== undefined && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Carbs</span>
+                        <span className="font-semibold">{result.nutriments.carbohydrates_100g}g</span>
+                      </div>
+                    )}
+                    {result.nutriments.saturated_fat_100g !== undefined && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Saturated Fat</span>
+                        <span className="font-semibold">{result.nutriments.saturated_fat_100g}g</span>
+                      </div>
+                    )}
+                    {result.nutriments.fiber_100g !== undefined && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Fiber</span>
+                        <span className="font-semibold">{result.nutriments.fiber_100g}g</span>
+                      </div>
+                    )}
+                    {result.nutriments.sugars_100g !== undefined && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Sugars</span>
+                        <span className="font-semibold">{result.nutriments.sugars_100g}g</span>
+                      </div>
+                    )}
+                    {result.nutriments.salt_100g !== undefined && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Salt</span>
+                        <span className="font-semibold">{result.nutriments.salt_100g}g</span>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              )}
+            </div>
 
             {/* Factor Breakdown */}
             <Card className="p-6">

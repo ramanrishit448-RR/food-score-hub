@@ -214,6 +214,17 @@ CRITICAL:
       image: product.image_url || null,
       healthRisks: analysisResult.health_risks || [],
       alternatives: analysisResult.alternatives || [],
+      nutrientLevels: product.nutrient_levels || null,
+      nutriments: {
+        energy_100g: nutriments.energy_100g,
+        fat_100g: nutriments.fat_100g,
+        saturated_fat_100g: nutriments['saturated-fat_100g'],
+        carbohydrates_100g: nutriments.carbohydrates_100g,
+        sugars_100g: nutriments.sugars_100g,
+        fiber_100g: nutriments.fiber_100g,
+        proteins_100g: nutriments.proteins_100g,
+        salt_100g: nutriments.salt_100g,
+      },
     };
 
     console.log('Analysis complete:', result);
