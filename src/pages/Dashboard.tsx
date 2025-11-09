@@ -7,6 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BarChart3, History, LogOut, Trash2 } from "lucide-react";
 import ChartsSection from "@/components/dashboard/ChartsSection";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -18,6 +25,7 @@ const Dashboard = () => {
     healthyChoices: 0,
     avgScore: 0
   });
+  const [selectedScan, setSelectedScan] = useState<any>(null);
 
   useEffect(() => {
     // Check authentication
@@ -210,7 +218,11 @@ const Dashboard = () => {
           ) : (
             <div className="space-y-4">
               {scans.map((scan) => (
-                <div key={scan.id} className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
+                <div 
+                  key={scan.id} 
+                  className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => setSelectedScan(scan)}
+                >
                   {scan.product_image && (
                     <img 
                       src={scan.product_image} 
@@ -240,7 +252,10 @@ const Dashboard = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(scan.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(scan.id);
+                    }}
                     className="text-destructive hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -251,6 +266,123 @@ const Dashboard = () => {
           )}
         </Card>
       </div>
+
+      {/* Product Analysis Dialog */}
+      <Dialog open={!!selectedScan} onOpenChange={(open) => !open && setSelectedScan(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Product Analysis</DialogTitle>
+            <DialogDescription>
+              Detailed nutritional breakdown and health assessment
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedScan && (
+            <div className="space-y-6">
+              {/* Product Info */}
+              <div className="flex items-center gap-4">
+                {selectedScan.product_image && (
+                  <img 
+                    src={selectedScan.product_image} 
+                    alt={selectedScan.product_name}
+                    className="w-24 h-24 object-contain rounded"
+                  />
+                )}
+                <div>
+                  <h3 className="text-xl font-bold">{selectedScan.product_name}</h3>
+                  <p className="text-muted-foreground">{selectedScan.brand}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Scanned on {new Date(selectedScan.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+
+              {/* Overall Score */}
+              <Card className="p-6 bg-primary/5">
+                <div className="text-center">
+                  <div className="text-5xl font-bold text-primary mb-2">
+                    {selectedScan.health_score.toFixed(1)}
+                  </div>
+                  <div className={`text-xl font-semibold ${
+                    selectedScan.recommendation === 'EAT' ? 'text-green-600' :
+                    selectedScan.recommendation === 'BUY' ? 'text-yellow-600' :
+                    'text-red-600'
+                  }`}>
+                    {selectedScan.recommendation}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">Overall Health Score</p>
+                </div>
+              </Card>
+
+              {/* Health Factors */}
+              <div className="grid grid-cols-3 gap-4">
+                {selectedScan.nutrition_score !== null && (
+                  <Card className="p-4 text-center">
+                    <div className="text-2xl font-bold text-primary">
+                      {selectedScan.nutrition_score.toFixed(1)}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">Nutrition Score</p>
+                  </Card>
+                )}
+                {selectedScan.ingredient_quality !== null && (
+                  <Card className="p-4 text-center">
+                    <div className="text-2xl font-bold text-primary">
+                      {selectedScan.ingredient_quality.toFixed(1)}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">Ingredient Quality</p>
+                  </Card>
+                )}
+                {selectedScan.additives_score !== null && (
+                  <Card className="p-4 text-center">
+                    <div className="text-2xl font-bold text-primary">
+                      {selectedScan.additives_score.toFixed(1)}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">Additives Score</p>
+                  </Card>
+                )}
+              </div>
+
+              {/* Macronutrients */}
+              {(selectedScan.carbs || selectedScan.protein || selectedScan.fat) && (
+                <div>
+                  <h4 className="font-semibold mb-3">Macronutrients</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    {selectedScan.carbs !== null && (
+                      <Card className="p-4">
+                        <div className="text-center">
+                          <div className="text-xl font-bold">{selectedScan.carbs}g</div>
+                          <p className="text-sm text-muted-foreground">Carbs</p>
+                        </div>
+                      </Card>
+                    )}
+                    {selectedScan.protein !== null && (
+                      <Card className="p-4">
+                        <div className="text-center">
+                          <div className="text-xl font-bold">{selectedScan.protein}g</div>
+                          <p className="text-sm text-muted-foreground">Protein</p>
+                        </div>
+                      </Card>
+                    )}
+                    {selectedScan.fat !== null && (
+                      <Card className="p-4">
+                        <div className="text-center">
+                          <div className="text-xl font-bold">{selectedScan.fat}g</div>
+                          <p className="text-sm text-muted-foreground">Fat</p>
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Barcode */}
+              <div className="text-sm text-muted-foreground">
+                <strong>Barcode:</strong> {selectedScan.barcode}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
