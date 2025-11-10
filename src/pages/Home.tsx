@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ScanBarcode, Shield, Zap, Users } from "lucide-react";
+import { ScanBarcode, Shield, Zap, Users, Camera, TrendingUp } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { VoiceAssistant } from "@/components/VoiceAssistant";
+import FoodImageAnalysis from "@/components/FoodImageAnalysis";
 
 const Home = () => {
   return (
@@ -82,8 +83,113 @@ const Home = () => {
         </div>
       </section>
 
+      {/* AI Image Analysis Showcase */}
+      <section className="py-20 px-4 bg-gradient-to-br from-primary/10 via-background to-accent/10">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4">
+              <Camera className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">NEW: AI Image Analysis</span>
+            </div>
+            <h2 className="text-4xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Just Snap a Photo
+              </span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              No barcode? No problem. Our AI analyzes any food image to identify nutritional content, 
+              estimate macros, and provide instant health insights with interactive visualizations.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 items-center mb-12">
+            {/* Feature highlights */}
+            <div className="space-y-6">
+              <Card className="p-6 border-2 hover:border-primary/50 transition-colors">
+                <div className="flex items-start gap-4">
+                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Camera className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Instant Food Recognition</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Powered by Gemini 2.5 Flash, our AI identifies any food item from a simple photo 
+                      and extracts detailed nutritional information in seconds.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6 border-2 hover:border-primary/50 transition-colors">
+                <div className="flex items-start gap-4">
+                  <div className="h-12 w-12 rounded-xl bg-chart-1/20 flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="h-6 w-6 text-chart-1" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Smart Macro Breakdown</h3>
+                    <p className="text-muted-foreground text-sm">
+                      See carbs, protein, and fat distribution with beautiful pie charts. 
+                      Get estimated calories per 100g for any food item.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6 border-2 hover:border-primary/50 transition-colors">
+                <div className="flex items-start gap-4">
+                  <div className="h-12 w-12 rounded-xl bg-chart-2/20 flex items-center justify-center flex-shrink-0">
+                    <Shield className="h-6 w-6 text-chart-2" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Health Score Visualization</h3>
+                    <p className="text-muted-foreground text-sm">
+                      View your food's health rating (0-10) on an interactive gauge chart. 
+                      Understand at a glance if you should eat, buy, or avoid it.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+
+              <div className="pt-4">
+                <Link to="/scan">
+                  <Button size="lg" className="w-full gap-2">
+                    <Camera className="h-5 w-5" />
+                    Try Image Analysis Now
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Demo visualization */}
+            <div className="bg-muted/50 rounded-2xl p-6 border-2 border-border/50">
+              <div className="mb-4 text-center">
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Live Demo</p>
+                <p className="text-xs text-muted-foreground mt-1">Sample analysis result</p>
+              </div>
+              <FoodImageAnalysis 
+                macros={{
+                  calories: 320,
+                  carbs: 45,
+                  protein: 12,
+                  fat: 8
+                }}
+                score={7.5}
+                name="Grilled Chicken Salad"
+              />
+            </div>
+          </div>
+
+          <div className="text-center bg-primary/5 rounded-xl p-8 border border-primary/20">
+            <h3 className="text-xl font-bold mb-2">Works with Any Food Photo</h3>
+            <p className="text-muted-foreground">
+              Restaurant meals • Home-cooked dishes • Packaged foods • Fresh produce • And more!
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* What Makes Us Different Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-primary/5 to-accent/5">
+      <section className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">What Makes FoodSight AI Different?</h2>
