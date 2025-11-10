@@ -20,6 +20,7 @@ export type Database = {
           alternatives: Json | null
           barcode: string
           brand: string | null
+          calories: number | null
           carbs: number | null
           created_at: string
           fat: number | null
@@ -39,6 +40,7 @@ export type Database = {
           alternatives?: Json | null
           barcode: string
           brand?: string | null
+          calories?: number | null
           carbs?: number | null
           created_at?: string
           fat?: number | null
@@ -58,6 +60,7 @@ export type Database = {
           alternatives?: Json | null
           barcode?: string
           brand?: string | null
+          calories?: number | null
           carbs?: number | null
           created_at?: string
           fat?: number | null

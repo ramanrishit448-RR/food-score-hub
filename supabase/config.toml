@@ -3,5 +3,8 @@ project_id = "cinrrfxtvsuqdjsjkiex"
 [functions.analyze-product]
 verify_jwt = true
 
+[functions.analyze-food-image]
+verify_jwt = true
+
 [functions.voice-assistant]
 verify_jwt = false

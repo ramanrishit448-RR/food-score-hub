@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ScanBarcode, Loader2, Camera, Keyboard } from "lucide-react";
+import { ScanBarcode, Loader2, Camera, Keyboard, Image } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
+import FoodImageAnalysis from "@/components/FoodImageAnalysis";
 
 interface HealthRisk {
   nutrient: string;
@@ -39,6 +40,13 @@ interface Nutriments {
   salt_100g?: number;
 }
 
+interface MacroData {
+  calories?: number;
+  carbs?: number;
+  protein?: number;
+  fat?: number;
+}
+
 interface ProductResult {
   name: string;
   brand: string;
@@ -54,6 +62,8 @@ interface ProductResult {
   alternatives?: Alternative[];
   nutrientLevels?: NutrientLevels;
   nutriments?: Nutriments;
+  macros?: MacroData;
+  description?: string;
 }
 
 const Scan = () => {
@@ -61,10 +71,12 @@ const Scan = () => {
   const [barcode, setBarcode] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ProductResult | null>(null);
-  const [scanMode, setScanMode] = useState<"manual" | "camera">("manual");
+  const [scanMode, setScanMode] = useState<"manual" | "camera" | "image">("manual");
   const [isScanning, setIsScanning] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const scannerDivId = "barcode-scanner";
 
   useEffect(() => {
@@ -146,6 +158,54 @@ const Scan = () => {
     } catch (error: any) {
       console.error("Error analyzing product:", error);
       const msg = error?.message || "Failed to analyze product. Please try again.";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setSelectedImage(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleImageAnalysis = async () => {
+    if (!selectedImage) {
+      toast.error("Please select an image first");
+      return;
+    }
+
+    if (!user) {
+      toast.error("Please sign in to analyze images");
+      navigate("/auth");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const { data, error } = await supabase.functions.invoke('analyze-food-image', {
+        body: { imageBase64: selectedImage },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      setResult(data);
+      toast.success("Food image analyzed and saved to your dashboard!");
+    } catch (error: any) {
+      console.error("Error analyzing image:", error);
+      const msg = error?.message || "Failed to analyze image. Please try again.";
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -259,7 +319,7 @@ const Scan = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-3">Scan a Product</h1>
           <p className="text-muted-foreground">
-            Enter a barcode to analyze the product's nutritional value
+            Scan barcodes or analyze food images with AI
           </p>
         </div>
 
@@ -271,6 +331,7 @@ const Scan = () => {
               onClick={() => {
                 stopCameraScanning();
                 setScanMode("manual");
+                setSelectedImage(null);
               }}
               className="flex-1 gap-2"
             >
@@ -284,6 +345,17 @@ const Scan = () => {
             >
               <Camera className="h-4 w-4" />
               Camera
+            </Button>
+            <Button
+              variant={scanMode === "image" ? "default" : "outline"}
+              onClick={() => {
+                stopCameraScanning();
+                setScanMode("image");
+              }}
+              className="flex-1 gap-2"
+            >
+              <Image className="h-4 w-4" />
+              AI Image
             </Button>
           </div>
 
@@ -317,6 +389,51 @@ const Scan = () => {
               <p className="text-sm text-muted-foreground mt-2">
                 Try example: 3017620422003 (Nutella)
               </p>
+            </>
+          ) : scanMode === "image" ? (
+            <>
+              <div className="space-y-4">
+                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 hover:border-primary transition-colors cursor-pointer"
+                     onClick={() => fileInputRef.current?.click()}>
+                  <Image className="h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-sm text-muted-foreground text-center mb-2">
+                    Click to upload a food image
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    AI will analyze nutritional content
+                  </p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </div>
+                
+                {selectedImage && (
+                  <div className="space-y-4">
+                    <img 
+                      src={selectedImage} 
+                      alt="Selected food" 
+                      className="w-full max-h-64 object-contain rounded-lg"
+                    />
+                    <Button 
+                      onClick={handleImageAnalysis} 
+                      disabled={loading}
+                      size="lg"
+                      className="w-full gap-2"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <Image className="h-5 w-5" />
+                      )}
+                      Analyze with AI
+                    </Button>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <>
@@ -360,9 +477,9 @@ const Scan = () => {
             {/* Product Info */}
             <Card className="p-6">
               <div className="flex gap-6">
-                {result.image && (
+                {(result.image || selectedImage) && (
                   <img 
-                    src={result.image} 
+                    src={result.image || selectedImage || ''} 
                     alt={result.name}
                     className="w-24 h-24 object-contain rounded-lg"
                   />
@@ -370,6 +487,9 @@ const Scan = () => {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold mb-1">{result.name}</h2>
                   <p className="text-muted-foreground">{result.brand}</p>
+                  {result.description && (
+                    <p className="text-sm text-muted-foreground mt-2">{result.description}</p>
+                  )}
                 </div>
               </div>
             </Card>
@@ -384,6 +504,15 @@ const Scan = () => {
                 {result.recommendation}
               </div>
             </Card>
+
+            {/* AI Image Analysis Charts */}
+            {result.macros && (
+              <FoodImageAnalysis 
+                macros={result.macros}
+                score={result.score}
+                name={result.name}
+              />
+            )}
 
             {/* Nutrient Levels & Nutrition Facts Grid */}
             <div className="grid md:grid-cols-2 gap-6">
