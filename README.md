@@ -125,6 +125,25 @@ Supabase Database (Users, Scans, Health Scores)
 React Dashboard (Voice + Pie + Bar + Gauge)
 ```
 
+🍕 Gemini Multimodal Food Image Analyzer
+
+🧠 Overview
+
+The Gemini Multimodal Food Image Analyzer lets users upload images of food (like pizza, samosa, salad, etc.) and instantly receive AI-generated insights about their nutritional profile.
+Powered by Gemini 2.5 Flash, this feature can visually identify foods, estimate their calories, calculate macronutrient breakdowns, and assign a Health Score (0–10) — all in one request.
+
+This makes your app capable of analyzing foods that don’t have barcodes, turning it into a true AI nutrition assistant.
+
+⚙️ How It Works
+
+User Uploads Image — The user selects or captures a food image.
+
+Gemini Multimodal API — The image is sent to Gemini 2.5 Flash, which analyzes the visual content.
+
+AI Processing — Gemini identifies visible foods, estimates calories, macros (carbs/protein/fat), and gives a 0–10 health score with reasoning.
+
+Frontend Display — Results are shown in a clean visual dashboard with charts (Pie for macros, Gauge for score).
+
 ---
 
 ## 💬 Example Tagline
