@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+import { FloatingVoiceAssistant } from "@/components/FloatingVoiceAssistant";
 import Home from "./pages/Home";
 import Scan from "./pages/Scan";
 import About from "./pages/About";
@@ -29,6 +30,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <FloatingVoiceAssistant />
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

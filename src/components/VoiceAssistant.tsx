@@ -140,9 +140,8 @@ export const VoiceAssistant = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-4">
+    <div className="w-full space-y-4">
       <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Voice Nutrition Assistant</h2>
         
         <div className="flex justify-center gap-4 mb-6">
           <Button
