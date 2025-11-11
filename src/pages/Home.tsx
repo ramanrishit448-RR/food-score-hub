@@ -68,7 +68,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-background/80 to-accent/5">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-3xl font-bold text-center mb-12">
             Why Choose FoodSight AI?
@@ -238,7 +238,7 @@ const Home = () => {
       </section>
 
       {/* What Makes Us Different Section */}
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-background/80 to-accent/5">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">
@@ -361,7 +361,7 @@ const Home = () => {
       </section>
 
       {/* Voice Assistant Section */}
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="py-20 px-4 bg-gradient-to-bl from-primary/10 via-background to-accent/10">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-4">

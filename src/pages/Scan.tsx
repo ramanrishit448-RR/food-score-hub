@@ -71,7 +71,9 @@ const Scan = () => {
   const [barcode, setBarcode] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ProductResult | null>(null);
-  const [scanMode, setScanMode] = useState<"manual" | "camera" | "image">("manual");
+  const [scanMode, setScanMode] = useState<"manual" | "camera" | "image">(
+    "manual"
+  );
   const [isScanning, setIsScanning] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -83,14 +85,16 @@ const Scan = () => {
     // Check authentication status but don't require it
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user || null);
-      
+
       // Sync localStorage scans to database when user logs in
       if (session?.user) {
         syncLocalScansToDatabase(session.user.id);
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         setUser(session.user);
         // Sync scans when user signs in
@@ -110,7 +114,7 @@ const Scan = () => {
 
   const syncLocalScansToDatabase = async (userId: string) => {
     try {
-      const localScans = localStorage.getItem('pending_scans');
+      const localScans = localStorage.getItem("pending_scans");
       if (!localScans) return;
 
       const scans = JSON.parse(localScans);
@@ -118,30 +122,34 @@ const Scan = () => {
 
       console.log(`Syncing ${scans.length} local scans to database...`);
 
-      const { error } = await supabase.from('scans').insert(
-        scans.map(scan => ({
+      const { error } = await supabase.from("scans").insert(
+        scans.map((scan) => ({
           ...scan,
-          user_id: userId
+          user_id: userId,
         }))
       );
 
       if (!error) {
-        localStorage.removeItem('pending_scans');
-        toast.success(`${scans.length} scan${scans.length > 1 ? 's' : ''} synced to your dashboard!`);
+        localStorage.removeItem("pending_scans");
+        toast.success(
+          `${scans.length} scan${
+            scans.length > 1 ? "s" : ""
+          } synced to your dashboard!`
+        );
       }
     } catch (error) {
-      console.error('Error syncing local scans:', error);
+      console.error("Error syncing local scans:", error);
     }
   };
 
   const saveToLocalStorage = (scanData: any) => {
     try {
-      const localScans = localStorage.getItem('pending_scans');
+      const localScans = localStorage.getItem("pending_scans");
       const scans = localScans ? JSON.parse(localScans) : [];
       scans.push(scanData);
-      localStorage.setItem('pending_scans', JSON.stringify(scans));
+      localStorage.setItem("pending_scans", JSON.stringify(scans));
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
+      console.error("Error saving to localStorage:", error);
     }
   };
 
@@ -174,19 +182,26 @@ const Scan = () => {
 
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      const { data, error } = await supabase.functions.invoke('analyze-product', {
-        body: { barcode: digitsOnly },
-        headers: session?.access_token ? {
-          Authorization: `Bearer ${session.access_token}`
-        } : {}
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "analyze-product",
+        {
+          body: { barcode: digitsOnly },
+          headers: session?.access_token
+            ? {
+                Authorization: `Bearer ${session.access_token}`,
+              }
+            : {},
+        }
+      );
 
       if (error) throw error;
 
       setResult(data);
-      
+
       if (session?.user) {
         toast.success("Product analyzed and saved to your dashboard!");
       } else {
@@ -205,14 +220,15 @@ const Scan = () => {
           protein: data.nutriments?.proteins_100g || null,
           fat: data.nutriments?.fat_100g || null,
           health_risks: data.healthRisks || [],
-          alternatives: data.alternatives || []
+          alternatives: data.alternatives || [],
         };
         saveToLocalStorage(scanData);
         toast.success("Product analyzed! Sign in to save this scan.");
       }
     } catch (error: any) {
       console.error("Error analyzing product:", error);
-      const msg = error?.message || "Failed to analyze product. Please try again.";
+      const msg =
+        error?.message || "Failed to analyze product. Please try again.";
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -239,25 +255,32 @@ const Scan = () => {
 
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      const { data, error } = await supabase.functions.invoke('analyze-food-image', {
-        body: { imageBase64: selectedImage },
-        headers: session?.access_token ? {
-          Authorization: `Bearer ${session.access_token}`
-        } : {}
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "analyze-food-image",
+        {
+          body: { imageBase64: selectedImage },
+          headers: session?.access_token
+            ? {
+                Authorization: `Bearer ${session.access_token}`,
+              }
+            : {},
+        }
+      );
 
       if (error) throw error;
 
       setResult(data);
-      
+
       if (session?.user) {
         toast.success("Food image analyzed and saved to your dashboard!");
       } else {
         // Save to localStorage for later sync
         const scanData = {
-          barcode: 'IMAGE_SCAN',
+          barcode: "IMAGE_SCAN",
           product_name: data.name,
           brand: data.brand,
           health_score: data.score,
@@ -271,14 +294,15 @@ const Scan = () => {
           fat: data.macros?.fat || null,
           calories: data.macros?.calories || null,
           health_risks: data.healthRisks || [],
-          alternatives: data.alternatives || []
+          alternatives: data.alternatives || [],
         };
         saveToLocalStorage(scanData);
         toast.success("Food image analyzed! Sign in to save this scan.");
       }
     } catch (error: any) {
       console.error("Error analyzing image:", error);
-      const msg = error?.message || "Failed to analyze image. Please try again.";
+      const msg =
+        error?.message || "Failed to analyze image. Please try again.";
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -359,7 +383,7 @@ const Scan = () => {
   const getNutrientLevelBadge = (level?: string) => {
     if (!level) return null;
     const levelLower = level.toLowerCase();
-    
+
     if (levelLower === "low") {
       return (
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-800 border border-green-300 text-sm font-medium">
@@ -385,9 +409,9 @@ const Scan = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-background to-accent/10">
       <Navigation />
-      
+
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-3">Scan a Product</h1>
@@ -441,12 +465,12 @@ const Scan = () => {
                     placeholder="Enter barcode (e.g., 3017620422003)"
                     value={barcode}
                     onChange={(e) => setBarcode(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleScan()}
+                    onKeyPress={(e) => e.key === "Enter" && handleScan()}
                     className="text-lg"
                   />
                 </div>
-                <Button 
-                  onClick={() => handleScan()} 
+                <Button
+                  onClick={() => handleScan()}
                   disabled={loading}
                   size="lg"
                   className="gap-2"
@@ -466,8 +490,10 @@ const Scan = () => {
           ) : scanMode === "image" ? (
             <>
               <div className="space-y-4">
-                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 hover:border-primary transition-colors cursor-pointer"
-                     onClick={() => fileInputRef.current?.click()}>
+                <div
+                  className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 hover:border-primary transition-colors cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                >
                   <Image className="h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-sm text-muted-foreground text-center mb-2">
                     Click to upload a food image
@@ -483,16 +509,16 @@ const Scan = () => {
                     className="hidden"
                   />
                 </div>
-                
+
                 {selectedImage && (
                   <div className="space-y-4">
-                    <img 
-                      src={selectedImage} 
-                      alt="Selected food" 
+                    <img
+                      src={selectedImage}
+                      alt="Selected food"
                       className="w-full max-h-64 object-contain rounded-lg"
                     />
-                    <Button 
-                      onClick={handleImageAnalysis} 
+                    <Button
+                      onClick={handleImageAnalysis}
                       disabled={loading}
                       size="lg"
                       className="w-full gap-2"
@@ -510,14 +536,16 @@ const Scan = () => {
             </>
           ) : (
             <>
-              <div 
-                id={scannerDivId} 
+              <div
+                id={scannerDivId}
                 className="w-full rounded-lg overflow-hidden bg-muted"
                 style={{ minHeight: "300px" }}
               />
               {barcode && (
                 <div className="mt-4">
-                  <p className="text-sm text-muted-foreground mb-2">Detected barcode:</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Detected barcode:
+                  </p>
                   <div className="flex gap-2">
                     <Input
                       type="text"
@@ -525,8 +553,8 @@ const Scan = () => {
                       readOnly
                       className="flex-1"
                     />
-                    <Button 
-                      onClick={() => handleScan()} 
+                    <Button
+                      onClick={() => handleScan()}
                       disabled={loading}
                       className="gap-2"
                     >
@@ -552,12 +580,15 @@ const Scan = () => {
               <Card className="p-6 bg-primary/5 border-primary/20">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="text-center sm:text-left">
-                    <h3 className="text-lg font-semibold mb-1">Save This Scan to Your Dashboard</h3>
+                    <h3 className="text-lg font-semibold mb-1">
+                      Save This Scan to Your Dashboard
+                    </h3>
                     <p className="text-sm text-muted-foreground">
-                      Sign in or create an account to track your scans and see your nutrition history
+                      Sign in or create an account to track your scans and see
+                      your nutrition history
                     </p>
                   </div>
-                  <Button 
+                  <Button
                     onClick={() => navigate("/auth")}
                     size="lg"
                     className="gap-2 whitespace-nowrap"
@@ -572,8 +603,8 @@ const Scan = () => {
             <Card className="p-6">
               <div className="flex gap-6">
                 {(result.image || selectedImage) && (
-                  <img 
-                    src={result.image || selectedImage || ''} 
+                  <img
+                    src={result.image || selectedImage || ""}
                     alt={result.name}
                     className="w-24 h-24 object-contain rounded-lg"
                   />
@@ -582,7 +613,9 @@ const Scan = () => {
                   <h2 className="text-2xl font-bold mb-1">{result.name}</h2>
                   <p className="text-muted-foreground">{result.brand}</p>
                   {result.description && (
-                    <p className="text-sm text-muted-foreground mt-2">{result.description}</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {result.description}
+                    </p>
                   )}
                 </div>
               </div>
@@ -591,17 +624,25 @@ const Scan = () => {
             {/* Health Score */}
             <Card className="p-8 text-center">
               <h3 className="text-lg font-medium mb-4">Health Score</h3>
-              <div className={`text-6xl font-bold mb-4 ${getScoreColor(result.score)}`}>
+              <div
+                className={`text-6xl font-bold mb-4 ${getScoreColor(
+                  result.score
+                )}`}
+              >
                 {result.score.toFixed(1)}/10
               </div>
-              <div className={`inline-block px-6 py-3 rounded-full border-2 font-bold text-lg ${getRecommendationColor(result.recommendation)}`}>
+              <div
+                className={`inline-block px-6 py-3 rounded-full border-2 font-bold text-lg ${getRecommendationColor(
+                  result.recommendation
+                )}`}
+              >
                 {result.recommendation}
               </div>
             </Card>
 
             {/* AI Image Analysis Charts */}
             {result.macros && (
-              <FoodImageAnalysis 
+              <FoodImageAnalysis
                 macros={result.macros}
                 score={result.score}
                 name={result.name}
@@ -631,8 +672,12 @@ const Scan = () => {
                     )}
                     {result.nutrientLevels.saturated_fat && (
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Saturated Fat</span>
-                        {getNutrientLevelBadge(result.nutrientLevels.saturated_fat)}
+                        <span className="text-sm font-medium">
+                          Saturated Fat
+                        </span>
+                        {getNutrientLevelBadge(
+                          result.nutrientLevels.saturated_fat
+                        )}
                       </div>
                     )}
                     {result.nutrientLevels.sugars && (
@@ -649,57 +694,76 @@ const Scan = () => {
               {result.nutriments && (
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <span className="text-yellow-500">⚡</span> Key Nutrition Facts (per 100g)
+                    <span className="text-yellow-500">⚡</span> Key Nutrition
+                    Facts (per 100g)
                   </h3>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                     {result.nutriments.energy_100g !== undefined && (
                       <>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Energy</span>
-                          <span className="font-semibold">{result.nutriments.energy_100g} kcal</span>
+                          <span className="font-semibold">
+                            {result.nutriments.energy_100g} kcal
+                          </span>
                         </div>
                       </>
                     )}
                     {result.nutriments.proteins_100g !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Protein</span>
-                        <span className="font-semibold">{result.nutriments.proteins_100g}g</span>
+                        <span className="font-semibold">
+                          {result.nutriments.proteins_100g}g
+                        </span>
                       </div>
                     )}
                     {result.nutriments.fat_100g !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Fat</span>
-                        <span className="font-semibold">{result.nutriments.fat_100g}g</span>
+                        <span className="font-semibold">
+                          {result.nutriments.fat_100g}g
+                        </span>
                       </div>
                     )}
                     {result.nutriments.carbohydrates_100g !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Carbs</span>
-                        <span className="font-semibold">{result.nutriments.carbohydrates_100g}g</span>
+                        <span className="font-semibold">
+                          {result.nutriments.carbohydrates_100g}g
+                        </span>
                       </div>
                     )}
                     {result.nutriments.saturated_fat_100g !== undefined && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Saturated Fat</span>
-                        <span className="font-semibold">{result.nutriments.saturated_fat_100g}g</span>
+                        <span className="text-muted-foreground">
+                          Saturated Fat
+                        </span>
+                        <span className="font-semibold">
+                          {result.nutriments.saturated_fat_100g}g
+                        </span>
                       </div>
                     )}
                     {result.nutriments.fiber_100g !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Fiber</span>
-                        <span className="font-semibold">{result.nutriments.fiber_100g}g</span>
+                        <span className="font-semibold">
+                          {result.nutriments.fiber_100g}g
+                        </span>
                       </div>
                     )}
                     {result.nutriments.sugars_100g !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Sugars</span>
-                        <span className="font-semibold">{result.nutriments.sugars_100g}g</span>
+                        <span className="font-semibold">
+                          {result.nutriments.sugars_100g}g
+                        </span>
                       </div>
                     )}
                     {result.nutriments.salt_100g !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Salt</span>
-                        <span className="font-semibold">{result.nutriments.salt_100g}g</span>
+                        <span className="font-semibold">
+                          {result.nutriments.salt_100g}g
+                        </span>
                       </div>
                     )}
                   </div>
@@ -714,12 +778,16 @@ const Scan = () => {
                 <div>
                   <div className="flex justify-between mb-2">
                     <span>Nutrition Score</span>
-                    <span className="font-semibold">{result.factors.nutritionScore}/10</span>
+                    <span className="font-semibold">
+                      {result.factors.nutritionScore}/10
+                    </span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full bg-primary transition-all"
-                      style={{ width: `${result.factors.nutritionScore * 10}%` }}
+                      style={{
+                        width: `${result.factors.nutritionScore * 10}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -727,12 +795,16 @@ const Scan = () => {
                 <div>
                   <div className="flex justify-between mb-2">
                     <span>Ingredient Quality</span>
-                    <span className="font-semibold">{result.factors.ingredientQuality}/10</span>
+                    <span className="font-semibold">
+                      {result.factors.ingredientQuality}/10
+                    </span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full bg-primary transition-all"
-                      style={{ width: `${result.factors.ingredientQuality * 10}%` }}
+                      style={{
+                        width: `${result.factors.ingredientQuality * 10}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -740,10 +812,12 @@ const Scan = () => {
                 <div>
                   <div className="flex justify-between mb-2">
                     <span>Additives Score</span>
-                    <span className="font-semibold">{result.factors.additives}/10</span>
+                    <span className="font-semibold">
+                      {result.factors.additives}/10
+                    </span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full bg-primary transition-all"
                       style={{ width: `${result.factors.additives * 10}%` }}
                     />
@@ -762,17 +836,27 @@ const Scan = () => {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left py-3 px-2 font-semibold">Nutrient of Concern</th>
-                        <th className="text-left py-3 px-2 font-semibold">Associated Health Risks</th>
-                        <th className="text-left py-3 px-2 font-semibold">How It Affects You</th>
+                        <th className="text-left py-3 px-2 font-semibold">
+                          Nutrient of Concern
+                        </th>
+                        <th className="text-left py-3 px-2 font-semibold">
+                          Associated Health Risks
+                        </th>
+                        <th className="text-left py-3 px-2 font-semibold">
+                          How It Affects You
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {result.healthRisks.map((risk, index) => (
                         <tr key={index} className="border-b last:border-0">
-                          <td className="py-3 px-2 font-medium">{risk.nutrient}</td>
+                          <td className="py-3 px-2 font-medium">
+                            {risk.nutrient}
+                          </td>
                           <td className="py-3 px-2">{risk.risk}</td>
-                          <td className="py-3 px-2 text-muted-foreground">{risk.explanation}</td>
+                          <td className="py-3 px-2 text-muted-foreground">
+                            {risk.explanation}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -789,17 +873,24 @@ const Scan = () => {
                 </h3>
                 <div className="space-y-4">
                   {result.alternatives.map((alt, index) => (
-                    <div key={index} className="border-l-4 border-primary pl-4 py-2">
+                    <div
+                      key={index}
+                      className="border-l-4 border-primary pl-4 py-2"
+                    >
                       <h4 className="font-semibold text-base mb-2 flex items-center gap-2">
                         ✨ {alt.name}
                       </h4>
                       <p className="text-sm mb-1">
                         <span className="font-medium">Why it's better:</span>{" "}
-                        <span className="text-muted-foreground">{alt.why_better}</span>
+                        <span className="text-muted-foreground">
+                          {alt.why_better}
+                        </span>
                       </p>
                       <p className="text-sm">
                         <span className="font-medium">How it helps:</span>{" "}
-                        <span className="text-muted-foreground">{alt.how_helps}</span>
+                        <span className="text-muted-foreground">
+                          {alt.how_helps}
+                        </span>
                       </p>
                     </div>
                   ))}
