@@ -1,10 +1,10 @@
 project_id = "cinrrfxtvsuqdjsjkiex"
 
 [functions.analyze-product]
-verify_jwt = true
+verify_jwt = false
 
 [functions.analyze-food-image]
-verify_jwt = true
+verify_jwt = false
 
 [functions.voice-assistant]
 verify_jwt = false

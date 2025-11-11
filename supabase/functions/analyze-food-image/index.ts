@@ -13,18 +13,7 @@ serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const authHeader = req.headers.get('Authorization')!;
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user } } = await supabase.auth.getUser(token);
-
-    if (!user) {
-      throw new Error('Unauthorized');
-    }
 
     const { imageBase64 } = await req.json();
 
@@ -125,36 +114,47 @@ Important:
 
     console.log('Parsed analysis:', analysis);
 
-    // Save to database
-    const { data: scan, error: insertError } = await supabase
-      .from('scans')
-      .insert({
-        user_id: user.id,
-        barcode: 'IMAGE_SCAN',
-        product_name: analysis.food_name,
-        brand: 'Image Analysis',
-        health_score: analysis.health_score,
-        recommendation: analysis.recommendation,
-        nutrition_score: analysis.nutrition_score,
-        ingredient_quality: analysis.ingredient_quality,
-        additives_score: analysis.additives_score,
-        carbs: analysis.carbs,
-        protein: analysis.protein,
-        fat: analysis.fat,
-        calories: analysis.calories,
-        health_risks: analysis.health_risks || [],
-        alternatives: analysis.alternatives || [],
-        product_image: null
-      })
-      .select()
-      .single();
+    // Check if user is authenticated and save to database
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+    let userId = null;
 
-    if (insertError) {
-      console.error('Database insert error:', insertError);
-      throw insertError;
+    if (authHeader) {
+      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      userId = user?.id;
+
+      if (userId) {
+        const { error: insertError } = await supabase
+          .from('scans')
+          .insert({
+            user_id: userId,
+            barcode: 'IMAGE_SCAN',
+            product_name: analysis.food_name,
+            brand: 'Image Analysis',
+            health_score: analysis.health_score,
+            recommendation: analysis.recommendation,
+            nutrition_score: analysis.nutrition_score,
+            ingredient_quality: analysis.ingredient_quality,
+            additives_score: analysis.additives_score,
+            carbs: analysis.carbs,
+            protein: analysis.protein,
+            fat: analysis.fat,
+            calories: analysis.calories,
+            health_risks: analysis.health_risks || [],
+            alternatives: analysis.alternatives || [],
+            product_image: null
+          });
+
+        if (insertError) {
+          console.error('Database insert error:', insertError);
+        } else {
+          console.log('Scan saved successfully for user:', userId);
+        }
+      }
     }
-
-    console.log('Scan saved successfully:', scan.id);
 
     return new Response(
       JSON.stringify({

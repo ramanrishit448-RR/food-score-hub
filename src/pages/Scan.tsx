@@ -80,22 +80,23 @@ const Scan = () => {
   const scannerDivId = "barcode-scanner";
 
   useEffect(() => {
-    // Check authentication status
+    // Check authentication status but don't require it
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        toast.error("Please sign in to scan products");
-        navigate("/auth");
-      } else {
-        setUser(session.user);
+      setUser(session?.user || null);
+      
+      // Sync localStorage scans to database when user logs in
+      if (session?.user) {
+        syncLocalScansToDatabase(session.user.id);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        navigate("/auth");
-      }
       if (session?.user) {
         setUser(session.user);
+        // Sync scans when user signs in
+        syncLocalScansToDatabase(session.user.id);
+      } else {
+        setUser(null);
       }
     });
 
@@ -106,6 +107,43 @@ const Scan = () => {
       }
     };
   }, [isScanning, navigate]);
+
+  const syncLocalScansToDatabase = async (userId: string) => {
+    try {
+      const localScans = localStorage.getItem('pending_scans');
+      if (!localScans) return;
+
+      const scans = JSON.parse(localScans);
+      if (!Array.isArray(scans) || scans.length === 0) return;
+
+      console.log(`Syncing ${scans.length} local scans to database...`);
+
+      const { error } = await supabase.from('scans').insert(
+        scans.map(scan => ({
+          ...scan,
+          user_id: userId
+        }))
+      );
+
+      if (!error) {
+        localStorage.removeItem('pending_scans');
+        toast.success(`${scans.length} scan${scans.length > 1 ? 's' : ''} synced to your dashboard!`);
+      }
+    } catch (error) {
+      console.error('Error syncing local scans:', error);
+    }
+  };
+
+  const saveToLocalStorage = (scanData: any) => {
+    try {
+      const localScans = localStorage.getItem('pending_scans');
+      const scans = localScans ? JSON.parse(localScans) : [];
+      scans.push(scanData);
+      localStorage.setItem('pending_scans', JSON.stringify(scans));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  };
 
   // Start camera when scan mode changes to camera
   useEffect(() => {
@@ -134,27 +172,44 @@ const Scan = () => {
       return;
     }
 
-    if (!user) {
-      toast.error("Please sign in to scan products");
-      navigate("/auth");
-      return;
-    }
-
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
 
       const { data, error } = await supabase.functions.invoke('analyze-product', {
         body: { barcode: digitsOnly },
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`
-        }
+        headers: session?.access_token ? {
+          Authorization: `Bearer ${session.access_token}`
+        } : {}
       });
 
       if (error) throw error;
 
       setResult(data);
-      toast.success("Product analyzed and saved to your dashboard!");
+      
+      if (session?.user) {
+        toast.success("Product analyzed and saved to your dashboard!");
+      } else {
+        // Save to localStorage for later sync
+        const scanData = {
+          barcode: digitsOnly,
+          product_name: data.name,
+          brand: data.brand,
+          health_score: data.score,
+          recommendation: data.recommendation,
+          nutrition_score: data.factors.nutritionScore,
+          ingredient_quality: data.factors.ingredientQuality,
+          additives_score: data.factors.additives,
+          product_image: data.image,
+          carbs: data.nutriments?.carbohydrates_100g || null,
+          protein: data.nutriments?.proteins_100g || null,
+          fat: data.nutriments?.fat_100g || null,
+          health_risks: data.healthRisks || [],
+          alternatives: data.alternatives || []
+        };
+        saveToLocalStorage(scanData);
+        toast.success("Product analyzed! Sign in to save this scan.");
+      }
     } catch (error: any) {
       console.error("Error analyzing product:", error);
       const msg = error?.message || "Failed to analyze product. Please try again.";
@@ -182,27 +237,45 @@ const Scan = () => {
       return;
     }
 
-    if (!user) {
-      toast.error("Please sign in to analyze images");
-      navigate("/auth");
-      return;
-    }
-
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
 
       const { data, error } = await supabase.functions.invoke('analyze-food-image', {
         body: { imageBase64: selectedImage },
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`
-        }
+        headers: session?.access_token ? {
+          Authorization: `Bearer ${session.access_token}`
+        } : {}
       });
 
       if (error) throw error;
 
       setResult(data);
-      toast.success("Food image analyzed and saved to your dashboard!");
+      
+      if (session?.user) {
+        toast.success("Food image analyzed and saved to your dashboard!");
+      } else {
+        // Save to localStorage for later sync
+        const scanData = {
+          barcode: 'IMAGE_SCAN',
+          product_name: data.name,
+          brand: data.brand,
+          health_score: data.score,
+          recommendation: data.recommendation,
+          nutrition_score: data.factors.nutritionScore,
+          ingredient_quality: data.factors.ingredientQuality,
+          additives_score: data.factors.additives,
+          product_image: null,
+          carbs: data.macros?.carbs || null,
+          protein: data.macros?.protein || null,
+          fat: data.macros?.fat || null,
+          calories: data.macros?.calories || null,
+          health_risks: data.healthRisks || [],
+          alternatives: data.alternatives || []
+        };
+        saveToLocalStorage(scanData);
+        toast.success("Food image analyzed! Sign in to save this scan.");
+      }
     } catch (error: any) {
       console.error("Error analyzing image:", error);
       const msg = error?.message || "Failed to analyze image. Please try again.";
@@ -474,6 +547,27 @@ const Scan = () => {
         {/* Results Display */}
         {result && (
           <div className="space-y-6 animate-fade-in">
+            {/* Sign In Prompt for Unauthenticated Users */}
+            {!user && (
+              <Card className="p-6 bg-primary/5 border-primary/20">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="text-center sm:text-left">
+                    <h3 className="text-lg font-semibold mb-1">Save This Scan to Your Dashboard</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Sign in or create an account to track your scans and see your nutrition history
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => navigate("/auth")}
+                    size="lg"
+                    className="gap-2 whitespace-nowrap"
+                  >
+                    Sign In / Sign Up
+                  </Button>
+                </div>
+              </Card>
+            )}
+
             {/* Product Info */}
             <Card className="p-6">
               <div className="flex gap-6">
