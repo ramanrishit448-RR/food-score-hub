@@ -452,7 +452,7 @@ const Scan = () => {
               className="flex-1 gap-2"
             >
               <Image className="h-4 w-4" />
-              AI Image
+              Image
             </Button>
           </div>
 
