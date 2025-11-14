@@ -622,21 +622,74 @@ const Scan = () => {
             </Card>
 
             {/* Health Score */}
-            <Card className="p-8 text-center">
-              <h3 className="text-lg font-medium mb-4">Health Score</h3>
-              <div
-                className={`text-6xl font-bold mb-4 ${getScoreColor(
-                  result.score
-                )}`}
-              >
-                {result.score.toFixed(1)}/10
-              </div>
-              <div
-                className={`inline-block px-6 py-3 rounded-full border-2 font-bold text-lg ${getRecommendationColor(
-                  result.recommendation
-                )}`}
-              >
-                {result.recommendation}
+            <Card className="relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+              <div className="relative p-8">
+                <h3 className="text-lg font-semibold mb-6 text-foreground/80">
+                  Health Score Analysis
+                </h3>
+                
+                <div className="flex flex-col items-center gap-6">
+                  {/* Circular Score Display */}
+                  <div className="relative">
+                    {/* Outer ring with gradient */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary via-primary/50 to-accent animate-pulse opacity-20 blur-xl" />
+                    
+                    {/* Score circle */}
+                    <div className="relative w-40 h-40 rounded-full bg-gradient-to-br from-background to-muted border-4 border-primary/20 shadow-lg flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300">
+                      <div className={`text-5xl font-bold ${getScoreColor(result.score)} animate-fade-in`}>
+                        {result.score.toFixed(1)}
+                      </div>
+                      <div className="text-sm text-muted-foreground font-medium">
+                        out of 10
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Recommendation Badge */}
+                  <div className="flex flex-col items-center gap-3">
+                    <div
+                      className={`inline-flex items-center gap-2 px-8 py-3 rounded-full border-2 font-bold text-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${getRecommendationColor(
+                        result.recommendation
+                      )}`}
+                    >
+                      {result.recommendation === "EAT" && "✓"}
+                      {result.recommendation === "BUY" && "⚠"}
+                      {result.recommendation === "AVOID" && "⊗"}
+                      <span>{result.recommendation}</span>
+                    </div>
+                    
+                    {/* Score breakdown mini indicators */}
+                    <div className="flex gap-4 mt-2">
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="text-xs text-muted-foreground font-medium">
+                          Nutrition
+                        </div>
+                        <div className="text-sm font-bold text-primary">
+                          {result.factors.nutritionScore}/10
+                        </div>
+                      </div>
+                      <div className="w-px bg-border" />
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="text-xs text-muted-foreground font-medium">
+                          Quality
+                        </div>
+                        <div className="text-sm font-bold text-primary">
+                          {result.factors.ingredientQuality}/10
+                        </div>
+                      </div>
+                      <div className="w-px bg-border" />
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="text-xs text-muted-foreground font-medium">
+                          Additives
+                        </div>
+                        <div className="text-sm font-bold text-primary">
+                          {result.factors.additives}/10
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Card>
 
