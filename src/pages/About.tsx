@@ -94,7 +94,7 @@ const About = () => {
         <Card className="p-8 mt-8 bg-gradient-to-br from-primary/5 to-accent/5">
           <h2 className="text-2xl font-bold mb-4">Meet the Creator</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            FoodSight AI was created by a Rishit Raman who experienced firsthand
+            FoodSight AI was created by a Rishit Raman & Hariom Mishra who experienced firsthand
             the challenge of making healthy food choices in today's complex food
             landscape. After countless hours navigating confusing nutrition
             labels and contradictory health advice, we decided to build a
